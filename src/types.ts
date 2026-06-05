@@ -6,6 +6,8 @@ export interface MedicalAdvice {
   drink_recommended: string;
   drink_restricted: string;
   recommended_clinic: string;
+  severity_assessment: string;
+  follow_up_plan: string;
 }
 
 export interface PatientRecord {

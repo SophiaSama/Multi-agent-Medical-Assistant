@@ -86,6 +86,16 @@ const pharmacyGuideAgent = new Agent(
   "You are the Pharmacy Guide Agent. Based on the patient's symptoms, recommend standard OTC (over the counter) medications. Also provide specific allowed foods, restricted foods, allowed drinks, and restricted drinks. Format concisely."
 );
 
+const riskAssessmentAgent = new Agent(
+  "Risk-Assessment-Agent",
+  "You are the Risk Assessment Agent. Based on the patient's reported symptoms, evaluate the severity as Low, Medium, or High. Provide a one-sentence justification. Format your output as '<Level>: <reason>'."
+);
+
+const followUpAgent = new Agent(
+  "Follow-Up-Agent",
+  "You are the Follow-Up Agent. Based on the patient's symptoms, risk level, recommended clinic, and pharmacy guidance, generate a concise post-consultation care plan. Include: when to seek emergency care, expected recovery timeline, and two or three self-care actions. Be practical and brief."
+);
+
 // Synthesizer uses a typed response to format the final JSON
 const synthesizerAgent = new Agent(
   "Synthesizer-Agent",
@@ -125,13 +135,21 @@ async function startServer() {
       // Step 2 & 3: Run Sub-Agents in Parallel (Multi-Agent Routing)
       const contextBundle = { symptoms, location, frontDeskSummary: frontDeskResult };
       
-      const [clinicResult, pharmacyResult] = await Promise.all([
+      const [clinicResult, pharmacyResult, riskResult] = await Promise.all([
         clinicSeekerAgent.process("Find appropriate clinic options.", contextBundle),
-        pharmacyGuideAgent.process("Determine OTC medications and dietary limits.", contextBundle)
+        pharmacyGuideAgent.process("Determine OTC medications and dietary limits.", contextBundle),
+        riskAssessmentAgent.process("Evaluate the severity of these symptoms.", contextBundle)
       ]);
+
+      const followUpResult = await followUpAgent.process("Generate a post-consultation care plan.", {
+        ...contextBundle,
+        clinicRecommendation: clinicResult,
+        pharmacyGuidance: pharmacyResult,
+        riskAssessment: riskResult,
+      });
       
       // Step 4: Synthesizer Agent translates all findings into the strict JSON schema
-      const finalInput = `Front Desk: ${frontDeskResult}\nClinic: ${clinicResult}\nPharmacy: ${pharmacyResult}`;
+      const finalInput = `Front Desk: ${frontDeskResult}\nClinic: ${clinicResult}\nPharmacy: ${pharmacyResult}\nRisk Assessment: ${riskResult}\nFollow-Up Plan: ${followUpResult}`;
       console.log(`[Synthesizer-Agent] Synthesizing final payload...`);
       
       const interaction = await ai.interactions.create({
@@ -147,11 +165,14 @@ async function startServer() {
             food_restricted: { type: Type.STRING },
             drink_recommended: { type: Type.STRING },
             drink_restricted: { type: Type.STRING },
-            recommended_clinic: { type: Type.STRING }
+            recommended_clinic: { type: Type.STRING },
+            severity_assessment: { type: Type.STRING },
+            follow_up_plan: { type: Type.STRING }
           },
           required: [
-             "conclusion", "OTC_medication_recommended", "food_recommended", 
-             "food_restricted", "drink_recommended", "drink_restricted", "recommended_clinic"
+             "conclusion", "OTC_medication_recommended", "food_recommended",
+             "food_restricted", "drink_recommended", "drink_restricted", "recommended_clinic",
+             "severity_assessment", "follow_up_plan"
           ]
         }
       });

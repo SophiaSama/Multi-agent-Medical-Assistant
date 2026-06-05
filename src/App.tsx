@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Bot, User, Stethoscope, Pill, Locate, Coffee, ShieldAlert, ChevronRight, Apple, Activity, Key } from 'lucide-react';
+import { Bot, User, Stethoscope, Pill, Locate, Coffee, ShieldAlert, ChevronRight, Apple, Activity, Key, ClipboardList } from 'lucide-react';
 import { MedicalAdvice } from './types.ts';
 import { motion, AnimatePresence } from 'motion/react';
 import { APIProvider, useMapsLibrary } from '@vis.gl/react-google-maps';
@@ -189,6 +189,12 @@ function MainApp() {
       setActiveAgent('pharmacy-guide');
       await new Promise(r => setTimeout(r, 1500));
 
+      setActiveAgent('risk-assessment');
+      await new Promise(r => setTimeout(r, 1000));
+
+      setActiveAgent('follow-up');
+      await new Promise(r => setTimeout(r, 1200));
+
       setActiveAgent('synthesizing');
 
       // Actual fetch
@@ -332,22 +338,36 @@ function MainApp() {
                          name="Front Desk Agent" 
                          icon={<Bot className="w-4 h-4" />} 
                          isActive={activeAgent === 'front-desk'} 
-                         isDone={['clinic-seeker', 'pharmacy-guide', 'synthesizing'].includes(activeAgent as string)}
+                         isDone={['clinic-seeker', 'pharmacy-guide', 'risk-assessment', 'follow-up', 'synthesizing'].includes(activeAgent as string)}
                          desc="Registering patient & analyzing history."
                        />
                        <AgentStatusItem 
                          name="Clinic Seeker" 
                          icon={<Stethoscope className="w-4 h-4" />} 
                          isActive={activeAgent === 'clinic-seeker'}
-                         isDone={['pharmacy-guide', 'synthesizing'].includes(activeAgent as string)} 
+                         isDone={['pharmacy-guide', 'risk-assessment', 'follow-up', 'synthesizing'].includes(activeAgent as string)}
                          desc="Locating nearby open medical facilities."
                        />
-                       <AgentStatusItem 
-                         name="Pharmacy Guide" 
-                         icon={<Pill className="w-4 h-4" />} 
+                       <AgentStatusItem
+                         name="Pharmacy Guide"
+                         icon={<Pill className="w-4 h-4" />}
                          isActive={activeAgent === 'pharmacy-guide'}
-                         isDone={activeAgent === 'synthesizing'} 
+                         isDone={['risk-assessment', 'follow-up', 'synthesizing'].includes(activeAgent as string)}
                          desc="Determining OTC meds & dietary limits."
+                       />
+                       <AgentStatusItem
+                         name="Risk Assessment"
+                         icon={<ShieldAlert className="w-4 h-4" />}
+                         isActive={activeAgent === 'risk-assessment'}
+                         isDone={['follow-up', 'synthesizing'].includes(activeAgent as string)}
+                         desc="Evaluating symptom severity level."
+                       />
+                       <AgentStatusItem
+                         name="Follow-Up Agent"
+                         icon={<ClipboardList className="w-4 h-4" />}
+                         isActive={activeAgent === 'follow-up'}
+                         isDone={activeAgent === 'synthesizing'}
+                         desc="Generating post-consultation care plan."
                        />
                        <AgentStatusItem 
                          name="Synthesizer" 
@@ -383,6 +403,22 @@ function MainApp() {
                     <p className="text-sm font-light leading-relaxed">
                        {result.conclusion}
                     </p>
+                  </div>
+
+                  <div className="bg-amber-50 rounded-xl p-5 border border-amber-200 shadow-sm mb-6">
+                    <div className="flex items-center gap-2 mb-2 text-amber-700">
+                      <ShieldAlert className="w-5 h-5" />
+                      <h4 className="font-bold uppercase text-xs tracking-wider">Risk Assessment</h4>
+                    </div>
+                    <p className="text-sm text-amber-900 font-medium">{result.severity_assessment}</p>
+                  </div>
+
+                  <div className="bg-teal-50 rounded-xl p-5 border border-teal-200 shadow-sm mb-6">
+                    <div className="flex items-center gap-2 mb-2 text-teal-700">
+                      <ClipboardList className="w-5 h-5" />
+                      <h4 className="font-bold uppercase text-xs tracking-wider">Follow-Up Care Plan</h4>
+                    </div>
+                    <p className="text-sm text-teal-900 leading-relaxed">{result.follow_up_plan}</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
