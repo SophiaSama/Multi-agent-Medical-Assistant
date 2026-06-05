@@ -196,9 +196,15 @@ async function startServer() {
         await supabase.from('medical_records').insert({
           patient_name: patientName,
           symptoms: symptoms,
-          diagnosis: jsonResponse.conclusion,
-          treatment_plan: jsonResponse.pharmacy_advice,
-          clinic_recommendations: jsonResponse.clinics
+          conclusion: jsonResponse.conclusion,
+          OTC_medication_recommended: jsonResponse.OTC_medication_recommended,
+          food_recommended: jsonResponse.food_recommended,
+          food_restricted: jsonResponse.food_restricted,
+          drink_recommended: jsonResponse.drink_recommended,
+          drink_restricted: jsonResponse.drink_restricted,
+          recommended_clinic: jsonResponse.recommended_clinic,
+          severity_assessment: jsonResponse.severity_assessment,
+          follow_up_plan: jsonResponse.follow_up_plan
         });
       }
 
