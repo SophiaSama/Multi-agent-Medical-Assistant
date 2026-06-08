@@ -14,7 +14,7 @@ npm run clean     # Remove dist/
 
 ## Architecture
 
-All six AI agents live in `server.ts` as instances of a lightweight `Agent` class (a thin ADK-style wrapper over the `@google/genai` Interactions API). They run against `gemini-2.5-flash`.
+All six AI agents live in `server.ts` as instances of a lightweight `Agent` class (a thin ADK-style wrapper over the `@google/genai` Interactions API). They run against `gemini-2.5-flash-lite`.
 
 | Agent | Role |
 |-------|------|

@@ -63,7 +63,7 @@ class Agent {
   systemInstruction: string;
   model: string;
 
-  constructor(name: string, systemInstruction: string, model: string = "gemini-2.5-flash") {
+  constructor(name: string, systemInstruction: string, model: string = "gemini-2.5-flash-lite") {
     this.name = name;
     this.systemInstruction = systemInstruction;
     this.model = model;
@@ -128,7 +128,7 @@ const followUpAgent = new Agent(
 const synthesizerAgent = new Agent(
   "Synthesizer-Agent",
   "You are the synthesis agent. Combine the outputs of the sub-agents into a final JSON structure. NEVER markdown the JSON, return raw JSON string.",
-  "gemini-2.5-flash"
+  "gemini-2.5-flash-lite"
 );
 
 
@@ -186,7 +186,7 @@ async function startServer() {
       console.log(`[Synthesizer-Agent] Synthesizing final payload...`);
       
       const interaction = await ai.interactions.create({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         input: finalInput,
         system_instruction: "You are the orchestrator. Synthesize the reports into a strict JSON.",
         response_format: {
