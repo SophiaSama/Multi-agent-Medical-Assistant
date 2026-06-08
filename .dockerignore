@@ -1,0 +1,32 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Dependencies & build output (rebuilt inside the image)
+node_modules
+dist
+build
+
+# Environment & secrets — never copy into the build context
+.env
+.env.*
+!.env.example
+
+# IDE / editor
+.vscode
+.idea
+*.swp
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docs / CI not needed at build time
+.github
+*.md
+!README.md
