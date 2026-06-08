@@ -1,9 +1,29 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
+import { setGlobalDispatcher, Agent as UndiciAgent } from "undici";
 import 'dotenv/config';
+
+// TLS trust: behind a corporate proxy, Node's global fetch (undici) may not trust
+// the proxy's root CA, causing UNABLE_TO_GET_ISSUER_CERT_LOCALLY on HTTPS calls
+// (e.g. to Supabase). Load an extra CA bundle from EXTRA_CA_CERTS (or
+// NODE_EXTRA_CA_CERTS) and apply it to every outbound fetch. This works
+// regardless of how/where the process was started.
+const extraCaPath = process.env.EXTRA_CA_CERTS || process.env.NODE_EXTRA_CA_CERTS;
+if (extraCaPath) {
+  try {
+    const ca = fs.readFileSync(extraCaPath);
+    setGlobalDispatcher(new UndiciAgent({ connect: { ca } }));
+    console.log(`[TLS] Loaded extra CA bundle from ${extraCaPath}`);
+  } catch (err) {
+    console.error(`[TLS] Failed to load CA bundle from ${extraCaPath}:`, err);
+  }
+} else {
+  console.warn(`[TLS] No EXTRA_CA_CERTS configured. If you are behind a TLS-intercepting proxy, set EXTRA_CA_CERTS in .env to a PEM bundle path.`);
+}
 
 const PORT = process.env.PORT || 3000;
 
@@ -21,9 +41,11 @@ let supabaseClient: any = null;
 function getSupabase() {
   if (!supabaseClient) {
     const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const key = process.env.SUPABASE_SECRET_API_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (url && key) {
       supabaseClient = createClient(url, key);
+    } else {
+      console.warn(`[Supabase] Not initialized. URL present: ${!!url}, Key present: ${!!key}.`);
     }
   }
   return supabaseClient;
@@ -78,7 +100,7 @@ const frontDeskAgent = new Agent(
 
 const clinicSeekerAgent = new Agent(
   "Clinic-Seeker-Agent",
-  "You are the Clinic Seeker Agent. You MUST search for 1-2 real hospitals, clinics, or polyclinics located in the specified patient location. If the location is Singapore (e.g., Tampines), suggest options like Tampines Polyclinic or Changi General Hospital. Do NOT suggest UK or European numbers like NHS 111 unless the patient is explicitly in those regions. If no location is provided at all, suggest that the user contact their local emergency services or national medical hotline. Be concise."
+  "You are the Clinic Seeker Agent. You MUST search for 1-2 real hospitals, clinics, or polyclinics located in the specified patient location. If the location is Singapore (e.g., Tampines), suggest local clinics that is nearest to user's location. Do NOT suggest UK or European numbers like NHS 111 unless the patient is explicitly in those regions. If no location is provided at all, suggest that the user contact their local emergency services or national medical hotline. Be concise."
 );
 
 const pharmacyGuideAgent = new Agent(
@@ -118,13 +140,16 @@ async function startServer() {
       if (supabase) {
         const { data, error } = await supabase
           .from('medical_records')
-          .select('symptoms, diagnosis, created_at')
+          .select('symptoms, conclusion, created_at')
           .eq('patient_name', patientName)
           .order('created_at', { ascending: false })
           .limit(3);
         
         if (data && data.length > 0) {
-          pastHistory = data.map((c: any) => `[${c.created_at}] Symptoms: ${c.symptoms}. Diagnosis: ${c.diagnosis}`).join("\n");
+          pastHistory = data.map((c: any) => `[${c.created_at}] Symptoms: ${c.symptoms}. Conclusion: ${c.conclusion}`).join("\n");
+        }
+        if (error) {
+          console.error(`[Memory] Failed to read patient history from Supabase:`, error);
         }
       }
 
@@ -193,7 +218,7 @@ async function startServer() {
       // Persistence: Save the consultation result to Supabase
       if (supabase) {
         console.log(`[Persistence] Saving record to Supabase...`);
-        await supabase.from('medical_records').insert({
+        const { error: insertError } = await supabase.from('medical_records').insert({
           patient_name: patientName,
           symptoms: symptoms,
           conclusion: jsonResponse.conclusion,
@@ -206,6 +231,13 @@ async function startServer() {
           severity_assessment: jsonResponse.severity_assessment,
           follow_up_plan: jsonResponse.follow_up_plan
         });
+        if (insertError) {
+          console.error(`[Persistence] Failed to save record to Supabase:`, insertError);
+        } else {
+          console.log(`[Persistence] Record saved successfully for ${patientName}.`);
+        }
+      } else {
+        console.warn(`[Persistence] Supabase client not configured — skipping save. Check SUPABASE_URL and SUPABASE_SECRET_API_KEY / SUPABASE_SERVICE_ROLE_KEY.`);
       }
 
       res.json(jsonResponse);
@@ -231,7 +263,7 @@ async function startServer() {
   }
 
   app.listen(Number(PORT), "0.0.0.0", () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 

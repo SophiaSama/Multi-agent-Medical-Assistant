@@ -3,9 +3,15 @@ CREATE TABLE IF NOT EXISTS medical_records (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   patient_name TEXT NOT NULL,
   symptoms TEXT,
-  diagnosis TEXT,
-  treatment_plan TEXT,
-  clinic_recommendations JSONB,
+  conclusion TEXT,
+  "OTC_medication_recommended" TEXT,
+  food_recommended TEXT,
+  food_restricted TEXT,
+  drink_recommended TEXT,
+  drink_restricted TEXT,
+  recommended_clinic TEXT,
+  severity_assessment TEXT,
+  follow_up_plan TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
