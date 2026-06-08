@@ -1,0 +1,91 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  integration:
+    name: LLM-as-judge integration tests
+    runs-on: ubuntu-latest
+    environment: GEMINI_API_KEY
+
+    env:
+      # Backend + judge need a Gemini key. Configure as a repository secret.
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GOOGLE_MAPS_PLATFORM_KEY: ${{ secrets.GOOGLE_MAPS_PLATFORM_KEY }}
+      # Supabase is optional — when unset the server skips history read/write.
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SECRET_API_KEY: ${{ secrets.SUPABASE_SECRET_API_KEY }}
+      BASE_URL: http://localhost:3000
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Guard on required secret
+        id: guard
+        run: |
+          if [ -z "${GEMINI_API_KEY}" ]; then
+            echo "GEMINI_API_KEY secret is not set — skipping integration tests."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node.js
+        if: steps.guard.outputs.run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.guard.outputs.run == 'true'
+        run: npm ci
+
+      - name: Type-check
+        if: steps.guard.outputs.run == 'true'
+        run: npm run lint
+
+      - name: Start server
+        if: steps.guard.outputs.run == 'true'
+        run: |
+          npm run dev > server.log 2>&1 &
+          echo "SERVER_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for server
+        if: steps.guard.outputs.run == 'true'
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sSf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Server is up."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Server failed to start within timeout. Logs:"
+          cat server.log
+          exit 1
+
+      - name: Run integration tests
+        if: steps.guard.outputs.run == 'true'
+        run: npm run test:integration
+
+      - name: Stop server
+        if: always() && steps.guard.outputs.run == 'true'
+        run: |
+          if [ -n "${SERVER_PID}" ]; then
+            kill "${SERVER_PID}" 2>/dev/null || true
+          fi
+
+      - name: Upload server log
+        if: always() && steps.guard.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-log
+          path: server.log
+          if-no-files-found: ignore
