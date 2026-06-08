@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ── Stage 1: Build (frontend + backend bundle) ────────────────────────────────
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 
 # Public, build-time-inlined values for the Vite frontend (vite.config.ts `define`).
@@ -33,14 +33,14 @@ CMD ["npm", "run", "test:integration"]
 
 # ── Stage 2: Production dependencies only ─────────────────────────────────────
 # server.cjs is bundled with --packages=external, so runtime needs node_modules.
-FROM node:20-alpine AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
 
 # ── Stage 3: Runtime ──────────────────────────────────────────────────────────
-FROM node:20-alpine AS runtime
+FROM node:22-alpine AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production \
