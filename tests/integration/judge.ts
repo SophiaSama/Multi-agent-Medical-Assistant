@@ -29,9 +29,7 @@ Evaluate whether the response satisfies EVERY criterion. Judge only against the
 stated criteria; do not invent new requirements. A criterion is satisfied if the
 response reasonably fulfills its intent. Be objective and concise.
 
-A field may contain extra justification beyond the required value. Treat a
-criterion as satisfied if the required value appears anywhere in the field — e.g.
-"Low: mild self-limiting symptoms" satisfies "severity is Low or Medium". Do not
+A field may contain extra justification beyond the required value. Do not
 fail a criterion merely because the field includes additional explanatory text.
 
 Output a JSON object:

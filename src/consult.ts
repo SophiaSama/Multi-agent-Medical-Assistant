@@ -52,7 +52,7 @@ async function runGroundedClinicSearch(location: string, symptoms: string): Prom
   }
 }
 
-// A lightweight Google-like ADK (Agent Development Kit) pattern wrapping the Interactions API
+// A lightweight Google-like ADK (Agent Development Kit) pattern over the stable generateContent API
 class Agent {
   name: string;
   systemInstruction: string;
@@ -68,21 +68,12 @@ class Agent {
     console.log(`[${this.name}] Processing...`);
     const prompt = `Context: ${JSON.stringify(context)}\n\nInput: ${input}`;
     try {
-      const interaction = await ai.interactions.create({
+      const response = await ai.models.generateContent({
         model: this.model,
-        system_instruction: this.systemInstruction,
-        input: prompt,
+        contents: prompt,
+        config: { systemInstruction: this.systemInstruction },
       });
-      let output = "";
-      for (const step of interaction.steps) {
-        if (step.type === "model_output") {
-          const textContent = step.content?.find((c) => c.type === "text");
-          if (textContent && textContent.text) {
-            output += textContent.text;
-          }
-        }
-      }
-      return output;
+      return (response.text ?? "").trim();
     } catch (e: any) {
       console.error(`[${this.name}] Error:`, e.message);
       return `Agent Error: ${e.message}`;
@@ -172,37 +163,35 @@ export async function runConsultation({ patientName, symptoms, location }: Consu
   // Step 4: Synthesizer translates all findings into the strict JSON schema
   const finalInput = `Front Desk: ${frontDeskResult}\nClinic: ${clinicResult}\nPharmacy: ${pharmacyResult}\nRisk Assessment: ${riskResult}\nFollow-Up Plan: ${followUpResult}`;
   console.log("[Synthesizer-Agent] Synthesizing final payload...");
-  const interaction = await ai.interactions.create({
+  const interaction = await ai.models.generateContent({
     model: synthesizerAgent.model,
-    input: finalInput,
-    system_instruction: "You are the orchestrator. Synthesize the reports into a strict JSON.",
-    response_format: {
-      type: Type.OBJECT,
-      properties: {
-        conclusion: { type: Type.STRING },
-        OTC_medication_recommended: { type: Type.STRING },
-        food_recommended: { type: Type.STRING },
-        food_restricted: { type: Type.STRING },
-        drink_recommended: { type: Type.STRING },
-        drink_restricted: { type: Type.STRING },
-        recommended_clinic: { type: Type.STRING },
-        severity_assessment: { type: Type.STRING },
-        follow_up_plan: { type: Type.STRING },
+    contents: finalInput,
+    config: {
+      systemInstruction: "You are the orchestrator. Synthesize the reports into a strict JSON.",
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          conclusion: { type: Type.STRING },
+          OTC_medication_recommended: { type: Type.STRING },
+          food_recommended: { type: Type.STRING },
+          food_restricted: { type: Type.STRING },
+          drink_recommended: { type: Type.STRING },
+          drink_restricted: { type: Type.STRING },
+          recommended_clinic: { type: Type.STRING },
+          severity_assessment: { type: Type.STRING },
+          follow_up_plan: { type: Type.STRING },
+        },
+        required: [
+          "conclusion", "OTC_medication_recommended", "food_recommended",
+          "food_restricted", "drink_recommended", "drink_restricted",
+          "recommended_clinic", "severity_assessment", "follow_up_plan",
+        ],
       },
-      required: [
-        "conclusion", "OTC_medication_recommended", "food_recommended",
-        "food_restricted", "drink_recommended", "drink_restricted",
-        "recommended_clinic", "severity_assessment", "follow_up_plan",
-      ],
     },
   });
 
-  let jsonOutput = "";
-  const lastStep = interaction.steps.at(-1);
-  if (lastStep && lastStep.type === "model_output") {
-    const textContent = lastStep.content?.find((c) => c.type === "text");
-    if (textContent) jsonOutput = textContent.text;
-  }
+  const jsonOutput = interaction.text ?? "";
   const cleaned = jsonOutput.replace(/```json\s*([\s\S]*?)\s*```/g, "$1").trim();
   const jsonResponse: MedicalAdvice = JSON.parse(cleaned);
 

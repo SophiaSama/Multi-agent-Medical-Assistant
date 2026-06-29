@@ -5,9 +5,9 @@ A medical consultation web app that orchestrates **six Google Gemini agents** to
 > ⚠️ **Disclaimer:** This is a demo application for educational purposes. It does **not** provide professional medical advice. Always consult a qualified healthcare provider.
 
 ## Demo
-![assessment](assets\assessment.png)
+![assessment](assets/assessment.png)
 
-![map](assets\clinics.png)
+![map](assets/clinics.png)
 
 ## Stack
 
