@@ -1,9 +1,9 @@
+import 'dotenv/config';
 import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { runConsultation } from "@/src/consult";
-import 'dotenv/config';
 
 // TLS trust: behind a corporate proxy, Node's global fetch (undici) may not trust
 // the proxy's root CA, causing UNABLE_TO_GET_ISSUER_CERT_LOCALLY on HTTPS calls

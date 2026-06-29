@@ -41,7 +41,11 @@ async function runGroundedClinicSearch(location: string, symptoms: string): Prom
         tools: [{ googleSearch: {} }],
       },
     });
-    return response.text ?? "Unable to find nearby clinics at this time.";
+    // Grounded responses often put text in candidate parts, leaving response.text empty.
+    const parts = response.candidates?.[0]?.content?.parts ?? [];
+    const partsText = parts.map((p: any) => p.text).filter(Boolean).join("\n").trim();
+    const text = (response.text ?? "").trim() || partsText;
+    return text || "Unable to find nearby clinics at this time.";
   } catch (err: any) {
     console.error("[Clinic-Seeker-Agent] Grounded search error:", err.message);
     return `Unable to find nearby clinics: ${err.message}`;

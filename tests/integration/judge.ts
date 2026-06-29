@@ -29,6 +29,11 @@ Evaluate whether the response satisfies EVERY criterion. Judge only against the
 stated criteria; do not invent new requirements. A criterion is satisfied if the
 response reasonably fulfills its intent. Be objective and concise.
 
+A field may contain extra justification beyond the required value. Treat a
+criterion as satisfied if the required value appears anywhere in the field — e.g.
+"Low: mild self-limiting symptoms" satisfies "severity is Low or Medium". Do not
+fail a criterion merely because the field includes additional explanatory text.
+
 Output a JSON object:
 - pass: true only if all criteria are satisfied.
 - score: integer 0-10 overall quality given the criteria.
@@ -47,7 +52,7 @@ export async function judge(
   ].join("\n\n");
 
   const interaction = await ai.interactions.create({
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-2.5-flash",
     input: evaluationInput,
     system_instruction: JUDGE_SYSTEM_INSTRUCTION,
     generation_config: { temperature: 0 },
