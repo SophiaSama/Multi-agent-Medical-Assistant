@@ -29,7 +29,7 @@ const <camelCaseName> = new Agent(
 );
 ```
 
-- Default model is `gemini-2.5-flash` (third argument is optional, only override for reasoning-heavy agents).
+- Default model is `gemini-2.5-flash-lite` (third argument is optional, only override for reasoning-heavy agents).
 - System instruction must specify output format so the Synthesizer can consume it.
 
 ## Step 3 — Wire into the Orchestration Flow

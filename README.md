@@ -11,7 +11,7 @@ A medical consultation web app that orchestrates **six Google Gemini agents** to
 | Frontend | React 19, Vite 6, Tailwind CSS v4, `motion`, `lucide-react` |
 | Maps | `@vis.gl/react-google-maps` (Google Places autocomplete) |
 | Backend | Express 4 (served via Vite middleware in dev, bundled to CJS by esbuild for prod) |
-| AI | `@google/genai` → `gemini-2.5-flash` |
+| AI | `@google/genai` → `gemini-2.5-flash-lite` |
 | Auth & DB | Supabase (email/password auth + `medical_records` table) |
 | Runtime | Node.js, `tsx` (dev watch), `undici` (corporate-proxy CA trust) |
 

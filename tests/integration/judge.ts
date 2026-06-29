@@ -47,7 +47,7 @@ export async function judge(
   ].join("\n\n");
 
   const interaction = await ai.interactions.create({
-    model: "gemini-2.5-flash",
+    model: "gemini-2.5-flash-lite",
     input: evaluationInput,
     system_instruction: JUDGE_SYSTEM_INSTRUCTION,
     response_format: {

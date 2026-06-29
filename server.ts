@@ -57,13 +57,35 @@ function getSupabase() {
   return supabaseClient;
 }
 
+// Clinic Seeker: uses Gemini Google Search grounding for real-time, verified clinic results
+async function runGroundedClinicSearch(location: string, symptoms: string): Promise<string> {
+  console.log('[Clinic-Seeker-Agent] Running grounded search...');
+  const userMsg = location?.trim()
+    ? `Find 1-2 currently open clinics or polyclinics near ${location} for a patient with these symptoms: ${symptoms}. Provide the clinic name, address, and phone number for each.`
+    : `No location was provided. Advise the patient to contact their local emergency services or national medical hotline.`;
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-lite',
+      contents: userMsg,
+      config: {
+        systemInstruction: "You are the Clinic Seeker Agent. Use Google Search to find real, currently open clinics near the patient's location. Prioritise clinics that are open right now. Present name, address, and phone number concisely. Do not fabricate clinic details.",
+        tools: [{ googleSearch: {} }],
+      },
+    });
+    return response.text ?? 'Unable to find nearby clinics at this time.';
+  } catch (err: any) {
+    console.error('[Clinic-Seeker-Agent] Grounded search error:', err.message);
+    return `Unable to find nearby clinics: ${err.message}`;
+  }
+}
+
 // A lightweight Google-like ADK (Agent Development Kit) pattern wrapping the Interactions API
 class Agent {
   name: string;
   systemInstruction: string;
   model: string;
 
-  constructor(name: string, systemInstruction: string, model: string = "gemini-2.5-flash") {
+  constructor(name: string, systemInstruction: string, model: string = "gemini-2.5-flash-lite") {
     this.name = name;
     this.systemInstruction = systemInstruction;
     this.model = model;
@@ -104,11 +126,6 @@ const frontDeskAgent = new Agent(
   "You are the Front Desk Agent. Register the user, summarize their symptoms briefly, and identify their patient profile. If past history is provided in context, acknowledge it to provide continuity. Output a concise patient summary."
 );
 
-const clinicSeekerAgent = new Agent(
-  "Clinic-Seeker-Agent",
-  "You are the Clinic Seeker Agent. You MUST search for 1-2 real hospitals, clinics, or polyclinics located in the specified patient location. If the location is Singapore (e.g., Tampines), suggest local clinics that is nearest to user's location. Do NOT suggest UK or European numbers like NHS 111 unless the patient is explicitly in those regions. If no location is provided at all, suggest that the user contact their local emergency services or national medical hotline. Be concise."
-);
-
 const pharmacyGuideAgent = new Agent(
   "Pharmacy-Guide-Agent",
   "You are the Pharmacy Guide Agent. Based on the patient's symptoms, recommend standard OTC (over the counter) medications. Also provide specific allowed foods, restricted foods, allowed drinks, and restricted drinks. Format concisely."
@@ -128,7 +145,7 @@ const followUpAgent = new Agent(
 const synthesizerAgent = new Agent(
   "Synthesizer-Agent",
   "You are the synthesis agent. Combine the outputs of the sub-agents into a final JSON structure. NEVER markdown the JSON, return raw JSON string.",
-  "gemini-2.5-flash"
+  "gemini-2.5-flash-lite"
 );
 
 
@@ -164,12 +181,13 @@ async function startServer() {
       // Step 1: Front Desk Agent with history awareness
       const registrationMetadata = { patientName, symptoms, pastHistory };
       const frontDeskResult = await frontDeskAgent.process("Register this patient.", registrationMetadata);
-      
-      // Step 2 & 3: Run Sub-Agents in Parallel (Multi-Agent Routing)
+
+      // Step 2: Run Sub-Agents in Parallel (Multi-Agent Routing)
+      // Clinic-Seeker uses Gemini Google Search grounding for real-time verified results.
       const contextBundle = { symptoms, location, frontDeskSummary: frontDeskResult };
-      
+
       const [clinicResult, pharmacyResult, riskResult] = await Promise.all([
-        clinicSeekerAgent.process("Find appropriate clinic options.", contextBundle),
+        runGroundedClinicSearch(location || '', symptoms),
         pharmacyGuideAgent.process("Determine OTC medications and dietary limits.", contextBundle),
         riskAssessmentAgent.process("Evaluate the severity of these symptoms.", contextBundle)
       ]);
@@ -186,7 +204,7 @@ async function startServer() {
       console.log(`[Synthesizer-Agent] Synthesizing final payload...`);
       
       const interaction = await ai.interactions.create({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.5-flash-lite",
         input: finalInput,
         system_instruction: "You are the orchestrator. Synthesize the reports into a strict JSON.",
         response_format: {

@@ -14,12 +14,12 @@ npm run clean     # Remove dist/
 
 ## Architecture
 
-All six AI agents live in `server.ts` as instances of a lightweight `Agent` class (a thin ADK-style wrapper over the `@google/genai` Interactions API). They run against `gemini-2.5-flash`.
+All six AI agents live in `server.ts` as instances of a lightweight `Agent` class (a thin ADK-style wrapper over the `@google/genai` Interactions API). They run against `gemini-2.5-flash-lite`.
 
 | Agent | Role |
 |-------|------|
 | Front-Desk-Agent | Registers patient, summarizes symptoms with prior-history context |
-| Clinic-Seeker-Agent | Finds region-appropriate hospitals/clinics for the patient location |
+| Clinic-Seeker-Agent | Finds open clinics near the patient's location using Gemini Google Search grounding |
 | Pharmacy-Guide-Agent | Recommends OTC meds + allowed/restricted food & drink |
 | Risk-Assessment-Agent | Rates severity Low/Medium/High with a one-line justification |
 | Follow-Up-Agent | Produces a post-consultation care plan |
@@ -27,7 +27,7 @@ All six AI agents live in `server.ts` as instances of a lightweight `Agent` clas
 
 **Orchestration flow** (`POST /api/consult`):
 1. Front-Desk runs first (sequential), enriched with prior history read from Supabase.
-2. Clinic-Seeker, Pharmacy-Guide, and Risk-Assessment run **in parallel** (`Promise.all`).
+2. Clinic-Seeker (`runGroundedClinicSearch` — uses Gemini Google Search grounding), Pharmacy-Guide, and Risk-Assessment run **in parallel** (`Promise.all`).
 3. Follow-Up runs next, consuming the parallel results.
 4. Synthesizer merges everything via Gemini's `response_format: Type.OBJECT` to enforce the `MedicalAdvice` schema; the result is returned and saved to Supabase.
 
@@ -54,7 +54,7 @@ Node's global `fetch` (undici) may not trust a corporate TLS-intercepting proxy'
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `GEMINI_API_KEY` | Yes | Gemini API access |
-| `GOOGLE_MAPS_PLATFORM_KEY` | Yes | Google Places Autocomplete |
+| `GOOGLE_MAPS_PLATFORM_KEY` | Yes | Google Places Autocomplete (frontend map widget only) |
 | `SUPABASE_URL` | Yes | Server Supabase project URL |
 | `SUPABASE_SECRET_API_KEY` | Yes* | Server key for `medical_records` read/write (bypasses RLS); `SUPABASE_SERVICE_ROLE_KEY` is accepted as a fallback |
 | `EXTRA_CA_CERTS` | No | Path to a PEM CA bundle; set only behind a TLS-intercepting proxy |
