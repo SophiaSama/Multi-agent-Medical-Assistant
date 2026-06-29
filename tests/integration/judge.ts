@@ -29,6 +29,11 @@ Evaluate whether the response satisfies EVERY criterion. Judge only against the
 stated criteria; do not invent new requirements. A criterion is satisfied if the
 response reasonably fulfills its intent. Be objective and concise.
 
+A field may contain extra justification beyond the required value. Treat a
+criterion as satisfied if the required value appears anywhere in the field — e.g.
+"Low: mild self-limiting symptoms" satisfies "severity is Low or Medium". Do not
+fail a criterion merely because the field includes additional explanatory text.
+
 Output a JSON object:
 - pass: true only if all criteria are satisfied.
 - score: integer 0-10 overall quality given the criteria.
@@ -47,9 +52,10 @@ export async function judge(
   ].join("\n\n");
 
   const interaction = await ai.interactions.create({
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-2.5-flash",
     input: evaluationInput,
     system_instruction: JUDGE_SYSTEM_INSTRUCTION,
+    generation_config: { temperature: 0 },
     response_format: {
       type: Type.OBJECT,
       properties: {
@@ -72,5 +78,23 @@ export async function judge(
   }
 
   const cleaned = raw.replace(/```json\s*([\s\S]*?)\s*```/g, "$1").trim();
-  return JSON.parse(cleaned) as JudgeVerdict;
+
+  let parsed: Partial<JudgeVerdict>;
+  try {
+    parsed = JSON.parse(cleaned) as Partial<JudgeVerdict>;
+  } catch (e: any) {
+    throw new Error(`Judge returned non-JSON output: ${e.message}\n  ${raw}`);
+  }
+
+  // Normalize the verdict: the model occasionally emits contradictory pass/score
+  // values (e.g. score 80, or pass:false while reasoning says all criteria met).
+  // Derive pass from failed_criteria and clamp score to the documented 0-10 range.
+  const failed_criteria = Array.isArray(parsed.failed_criteria) ? parsed.failed_criteria : [];
+  const score = Math.max(0, Math.min(10, Number(parsed.score) || 0));
+  return {
+    pass: failed_criteria.length === 0,
+    score,
+    reasoning: parsed.reasoning ?? "",
+    failed_criteria,
+  };
 }
