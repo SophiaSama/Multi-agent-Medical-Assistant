@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import 'dotenv/config';
+import { createClient } from "@supabase/supabase-js";
 
 import type { MedicalAdvice } from "../../src/types";
 import { judge, type JudgeVerdict } from "./judge";
@@ -134,6 +135,29 @@ function checkAgentCoverage(response: MedicalAdvice): AgentCoverageResult {
   return { pass: missing.length === 0, missing };
 }
 
+/**
+ * Deletes the medical_records rows created by this test run so probe patients
+ * don't accumulate prior-history across runs (which would make the Front-Desk
+ * agent mislabel symptoms as recurring/chronic). No-op if Supabase isn't
+ * configured.
+ */
+async function teardown(patientNames: string[]): Promise<void> {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SECRET_API_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key || patientNames.length === 0) return;
+
+  const supabase = createClient(url, key);
+  const { error } = await supabase
+    .from("medical_records")
+    .delete()
+    .in("patient_name", patientNames);
+  if (error) {
+    console.warn(`  Teardown: failed to delete test records: ${error.message}`);
+  } else {
+    console.log(`  Teardown: cleaned up records for ${patientNames.length} test patient(s).`);
+  }
+}
+
 async function run() {
   console.log(`\n  Integration tests (LLM-as-judge)`);
   console.log(`  Target:     ${BASE_URL}/api/consult`);
@@ -190,6 +214,8 @@ async function run() {
 
   const total = cases.length;
   console.log(`\n  Results: ${passed}/${total} passed, ${failures.length} failed\n`);
+
+  await teardown([...new Set(cases.map(c => c.input.patientName))]);
 
   process.exit(failures.length > 0 ? 1 : 0);
 }

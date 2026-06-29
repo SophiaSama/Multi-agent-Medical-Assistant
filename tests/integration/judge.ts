@@ -50,6 +50,7 @@ export async function judge(
     model: "gemini-2.5-flash-lite",
     input: evaluationInput,
     system_instruction: JUDGE_SYSTEM_INSTRUCTION,
+    generation_config: { temperature: 0 },
     response_format: {
       type: Type.OBJECT,
       properties: {
@@ -72,5 +73,23 @@ export async function judge(
   }
 
   const cleaned = raw.replace(/```json\s*([\s\S]*?)\s*```/g, "$1").trim();
-  return JSON.parse(cleaned) as JudgeVerdict;
+
+  let parsed: Partial<JudgeVerdict>;
+  try {
+    parsed = JSON.parse(cleaned) as Partial<JudgeVerdict>;
+  } catch (e: any) {
+    throw new Error(`Judge returned non-JSON output: ${e.message}\n  ${raw}`);
+  }
+
+  // Normalize the verdict: the model occasionally emits contradictory pass/score
+  // values (e.g. score 80, or pass:false while reasoning says all criteria met).
+  // Derive pass from failed_criteria and clamp score to the documented 0-10 range.
+  const failed_criteria = Array.isArray(parsed.failed_criteria) ? parsed.failed_criteria : [];
+  const score = Math.max(0, Math.min(10, Number(parsed.score) || 0));
+  return {
+    pass: failed_criteria.length === 0,
+    score,
+    reasoning: parsed.reasoning ?? "",
+    failed_criteria,
+  };
 }
