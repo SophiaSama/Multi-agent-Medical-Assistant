@@ -7,8 +7,8 @@ import { supabase, isSupabaseConfigured } from './lib/supabaseClient.ts';
 import Auth from './Auth.tsx';
 
 const API_KEY =
-  process.env.GOOGLE_MAPS_PLATFORM_KEY ||
   (import.meta as any).env?.VITE_GOOGLE_MAPS_PLATFORM_KEY ||
+  (typeof process !== 'undefined' ? (process.env as any)?.GOOGLE_MAPS_PLATFORM_KEY : undefined) ||
   (globalThis as any).GOOGLE_MAPS_PLATFORM_KEY ||
   '';
 const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';

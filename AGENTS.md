@@ -67,6 +67,7 @@ Node's global `fetch` (undici) may not trust a corporate TLS-intercepting proxy'
 |----------|----------|---------|
 | `VITE_SUPABASE_URL` | Yes | Supabase project URL for the browser auth client |
 | `VITE_SUPABASE_ANON_KEY` | Yes | Public anon key for auth (never the service/secret key) |
+| `VITE_GOOGLE_MAPS_PLATFORM_KEY` | No | Google Places Autocomplete (frontend map widget) |
 
 ## Conventions
 
