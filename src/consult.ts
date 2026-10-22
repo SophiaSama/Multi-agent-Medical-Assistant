@@ -10,6 +10,8 @@ const ai = new GoogleGenAI({
   httpOptions: { headers: { "User-Agent": "aistudio-build" } },
 });
 
+const DEFAULT_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+
 // Lazy Supabase Client
 let supabaseClient: any = null;
 function getSupabase() {
@@ -33,7 +35,7 @@ async function runGroundedClinicSearch(location: string, symptoms: string): Prom
     : `No location was provided. Advise the patient to contact their local emergency services or national medical hotline.`;
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
+      model: DEFAULT_MODEL,
       contents: userMsg,
       config: {
         systemInstruction:
@@ -58,7 +60,7 @@ class Agent {
   systemInstruction: string;
   model: string;
 
-  constructor(name: string, systemInstruction: string, model: string = "gemini-2.5-flash-lite") {
+  constructor(name: string, systemInstruction: string, model: string = DEFAULT_MODEL) {
     this.name = name;
     this.systemInstruction = systemInstruction;
     this.model = model;
@@ -104,7 +106,7 @@ const followUpAgent = new Agent(
 const synthesizerAgent = new Agent(
   "Synthesizer-Agent",
   "You are the synthesis agent. Combine the outputs of the sub-agents into a final JSON structure. NEVER markdown the JSON, return raw JSON string.",
-  "gemini-2.5-flash-lite"
+  DEFAULT_MODEL
 );
 
 export interface ConsultInput {

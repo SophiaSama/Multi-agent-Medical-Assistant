@@ -14,7 +14,7 @@ npm run clean     # Remove dist/
 
 ## Architecture
 
-All six AI agents live in `server.ts` as instances of a lightweight `Agent` class (a thin ADK-style wrapper over the `@google/genai` Interactions API). They run against `gemini-2.5-flash-lite`.
+All six AI agents live in `server.ts` as instances of a lightweight `Agent` class (a thin ADK-style wrapper over the `@google/genai` Interactions API). They run against `process.env.GEMINI_MODEL` (defaulting to `gemini-3.5-flash-lite`).
 
 | Agent | Role |
 |-------|------|
@@ -54,6 +54,7 @@ Node's global `fetch` (undici) may not trust a corporate TLS-intercepting proxy'
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `GEMINI_API_KEY` | Yes | Gemini API access |
+| `GEMINI_MODEL` | No | Gemini model name (defaults to `gemini-3.5-flash-lite`) |
 | `GOOGLE_MAPS_PLATFORM_KEY` | Yes | Google Places Autocomplete (frontend map widget only) |
 | `SUPABASE_URL` | Yes | Server Supabase project URL |
 | `SUPABASE_SECRET_API_KEY` | Yes* | Server key for `medical_records` read/write (bypasses RLS); `SUPABASE_SERVICE_ROLE_KEY` is accepted as a fallback |
