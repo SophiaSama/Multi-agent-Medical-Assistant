@@ -29,7 +29,9 @@ Evaluate whether the response satisfies EVERY criterion. Judge only against the
 stated criteria; do not invent new requirements. A criterion is satisfied if the
 response reasonably fulfills its intent. Be objective and concise.
 
-A field may contain extra justification beyond the required value. Do not
+A field may contain extra justification beyond the required value. Treat a
+criterion as satisfied if the required value appears anywhere in the field — e.g.
+"Low: mild self-limiting symptoms" satisfies "severity is Low or Medium". Do not
 fail a criterion merely because the field includes additional explanatory text.
 
 Output a JSON object:
@@ -49,32 +51,27 @@ export async function judge(
     `SYSTEM RESPONSE (MedicalAdvice JSON):\n${JSON.stringify(response, null, 2)}`,
   ].join("\n\n");
 
-  const interaction = await ai.interactions.create({
+  const responseObj = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    input: evaluationInput,
-    system_instruction: JUDGE_SYSTEM_INSTRUCTION,
-    generation_config: { temperature: 0 },
-    response_format: {
-      type: Type.OBJECT,
-      properties: {
-        pass: { type: Type.BOOLEAN },
-        score: { type: Type.INTEGER },
-        reasoning: { type: Type.STRING },
-        failed_criteria: { type: Type.ARRAY, items: { type: Type.STRING } },
+    contents: evaluationInput,
+    config: {
+      systemInstruction: JUDGE_SYSTEM_INSTRUCTION,
+      temperature: 0,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          pass: { type: Type.BOOLEAN },
+          score: { type: Type.INTEGER },
+          reasoning: { type: Type.STRING },
+          failed_criteria: { type: Type.ARRAY, items: { type: Type.STRING } },
+        },
+        required: ["pass", "score", "reasoning", "failed_criteria"],
       },
-      required: ["pass", "score", "reasoning", "failed_criteria"],
     },
   });
 
-  let raw = "";
-  const lastStep = interaction.steps.at(-1);
-  if (lastStep && lastStep.type === 'model_output') {
-    const textContent = lastStep.content?.find(c => c.type === 'text');
-    if (textContent && textContent.text) {
-      raw = textContent.text;
-    }
-  }
-
+  const raw = (responseObj.text ?? "").trim();
   const cleaned = raw.replace(/```json\s*([\s\S]*?)\s*```/g, "$1").trim();
 
   let parsed: Partial<JudgeVerdict>;
