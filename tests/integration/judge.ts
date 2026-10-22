@@ -52,7 +52,7 @@ export async function judge(
   ].join("\n\n");
 
   const responseObj = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: process.env.GEMINI_JUDGE_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash",
     contents: evaluationInput,
     config: {
       systemInstruction: JUDGE_SYSTEM_INSTRUCTION,
