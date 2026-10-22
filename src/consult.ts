@@ -33,7 +33,7 @@ async function runGroundedClinicSearch(location: string, symptoms: string): Prom
     : `No location was provided. Advise the patient to contact their local emergency services or national medical hotline.`;
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.5-flash-lite",
       contents: userMsg,
       config: {
         systemInstruction:
@@ -58,7 +58,7 @@ class Agent {
   systemInstruction: string;
   model: string;
 
-  constructor(name: string, systemInstruction: string, model: string = "gemini-2.5-flash-lite") {
+  constructor(name: string, systemInstruction: string, model: string = "gemini-3.5-flash-lite") {
     this.name = name;
     this.systemInstruction = systemInstruction;
     this.model = model;
@@ -104,7 +104,7 @@ const followUpAgent = new Agent(
 const synthesizerAgent = new Agent(
   "Synthesizer-Agent",
   "You are the synthesis agent. Combine the outputs of the sub-agents into a final JSON structure. NEVER markdown the JSON, return raw JSON string.",
-  "gemini-2.5-flash-lite"
+  "gemini-3.5-flash-lite"
 );
 
 export interface ConsultInput {
