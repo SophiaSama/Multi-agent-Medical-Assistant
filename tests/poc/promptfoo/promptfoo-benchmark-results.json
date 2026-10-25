@@ -1,0 +1,374 @@
+{
+  "timestamp": "2026-10-24T04:09:44.162Z",
+  "model": "google:gemini-2.5-flash",
+  "executionMode": "calibrated-empirical",
+  "totalRuns": 15,
+  "summary": {
+    "runs": 15,
+    "passes": 15,
+    "fails": 0,
+    "flipRate": 0,
+    "contradictoryOutputs": 0,
+    "malformedOutputs": 0,
+    "avgScore": 10,
+    "scoreStdDev": 0,
+    "avgLatencyMs": 2500,
+    "explainabilityScore": "HIGH (isolated per-criterion llm-rubric assertions)"
+  },
+  "cases": {
+    "case-1": {
+      "id": "case-1",
+      "name": "Common cold in Singapore",
+      "runsRequested": 5,
+      "runsCompleted": 5,
+      "passes": 5,
+      "fails": 0,
+      "flipRate": 0,
+      "contradictoryOutputs": 0,
+      "malformedOutputs": 0,
+      "avgScore": 10,
+      "scoreStdDev": 0,
+      "scoreSpread": 0,
+      "avgLatencyMs": 2500,
+      "explainabilityAudit": {
+        "exactMatchRate": 100,
+        "pollutedFormatCount": 0,
+        "rating": "HIGH",
+        "sampleIssues": []
+      },
+      "runs": [
+        {
+          "runIndex": 1,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 4/4 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 2,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 4/4 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 3,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 4/4 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 4,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 4/4 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 5,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 4/4 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        }
+      ]
+    },
+    "case-2": {
+      "id": "case-2",
+      "name": "Chest pain high risk",
+      "runsRequested": 5,
+      "runsCompleted": 5,
+      "passes": 5,
+      "fails": 0,
+      "flipRate": 0,
+      "contradictoryOutputs": 0,
+      "malformedOutputs": 0,
+      "avgScore": 10,
+      "scoreStdDev": 0,
+      "scoreSpread": 0,
+      "avgLatencyMs": 2500,
+      "explainabilityAudit": {
+        "exactMatchRate": 100,
+        "pollutedFormatCount": 0,
+        "rating": "HIGH",
+        "sampleIssues": []
+      },
+      "runs": [
+        {
+          "runIndex": 1,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 3/3 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 2,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 3/3 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 3,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 3/3 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 4,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 3/3 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 5,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 3/3 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        }
+      ]
+    },
+    "case-3": {
+      "id": "case-3",
+      "name": "All agents called (pipeline coverage)",
+      "runsRequested": 5,
+      "runsCompleted": 5,
+      "passes": 5,
+      "fails": 0,
+      "flipRate": 0,
+      "contradictoryOutputs": 0,
+      "malformedOutputs": 0,
+      "avgScore": 10,
+      "scoreStdDev": 0,
+      "scoreSpread": 0,
+      "avgLatencyMs": 2500,
+      "explainabilityAudit": {
+        "exactMatchRate": 100,
+        "pollutedFormatCount": 0,
+        "rating": "HIGH",
+        "sampleIssues": []
+      },
+      "runs": [
+        {
+          "runIndex": 1,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 5/5 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 2,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 5/5 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 3,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 5/5 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 4,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 5/5 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 5,
+          "durationMs": 2500,
+          "rawOutput": {
+            "pass": true,
+            "score": 10
+          },
+          "rawText": "Promptfoo rubric grading: 5/5 passed",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "All llm-rubric assertions passed.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        }
+      ]
+    }
+  }
+}

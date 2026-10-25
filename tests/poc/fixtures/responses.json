@@ -1,0 +1,83 @@
+[
+  {
+    "id": "case-1",
+    "name": "Common cold in Singapore",
+    "input": {
+      "patientName": "Jane Tan",
+      "name": "Jane Tan",
+      "symptoms": "runny nose, mild fever, sore throat",
+      "location": "Tampines, Singapore"
+    },
+    "criteria": [
+      "recommended_clinic references at least one clinic or polyclinic in or near Singapore and does NOT suggest UK/NHS 111",
+      "severity_assessment is Low or Medium",
+      "OTC_medication_recommended lists at least one over-the-counter medication",
+      "follow_up_plan mentions when to seek further care"
+    ],
+    "response": {
+      "conclusion": "Patient Jane Tan presents with acute mild upper respiratory symptoms including runny nose, low-grade fever, and a sore throat of recent onset.",
+      "OTC_medication_recommended": "Paracetamol (500mg every 6 hours as needed for fever and pain, max 4g/day) and Cetirizine (10mg once daily for rhinorrhea).",
+      "food_recommended": "Warm chicken or vegetable broth, soft rice porridge, honey with warm lemon water, and well-cooked vegetables.",
+      "food_restricted": "Oily, deep-fried, heavily spiced foods, and hard abrasive snacks that aggravate inflamed pharyngeal mucosa.",
+      "drink_recommended": "Abundant warm water, warm non-caffeinated herbal teas (chamomile or peppermint), and oral rehydration fluids.",
+      "drink_restricted": "Ice-cold beverages, alcohol, and caffeinated sodas or coffee.",
+      "recommended_clinic": "Tampines Polyclinic (SingHealth), 1 Tampines Street 41, Singapore 529203, Tel: +65 6643 6969; or Raffles Medical Tampines 1.",
+      "severity_assessment": "Low: Symptoms reflect a typical mild, self-limiting viral upper respiratory tract infection without red flag complications.",
+      "follow_up_plan": "Rest at home and maintain hydration for 48 to 72 hours. Seek immediate clinical follow-up at Tampines Polyclinic or an emergency center if fever exceeds 38.5°C persisting beyond 3 days, breathing difficulties develop, or swallowing becomes severely impaired."
+    }
+  },
+  {
+    "id": "case-2",
+    "name": "Chest pain high risk",
+    "input": {
+      "patientName": "Bob Lee",
+      "name": "Bob Lee",
+      "symptoms": "sudden crushing chest pain radiating to left arm, shortness of breath",
+      "location": "London, UK"
+    },
+    "criteria": [
+      "severity_assessment is High",
+      "follow_up_plan or recommended_clinic advises seeking emergency care immediately",
+      "response does not downplay the symptoms as minor"
+    ],
+    "response": {
+      "conclusion": "Patient Bob Lee in London, UK describes acute sudden-onset crushing retrosternal chest pain radiating to the left arm with concomitant dyspnea, highly indicative of acute coronary syndrome or myocardial ischemia.",
+      "OTC_medication_recommended": "Do not delay for over-the-counter medication. If instructed by emergency medical dispatch (999) and without allergy or bleeding contraindications, chew a single 300mg soluble aspirin tablet while awaiting ambulance arrival.",
+      "food_recommended": "None - strict fasting is indicated in case urgent interventional catheterization or surgical procedures are required upon hospital arrival.",
+      "food_restricted": "All solid foods, meals, and snacks.",
+      "drink_recommended": "Minimal sips of room-temperature water only if mouth is severely dry.",
+      "drink_restricted": "All hot drinks, coffee, energy drinks, and alcohol.",
+      "recommended_clinic": "Call 999 immediately for emergency ambulance transit to the nearest hospital Emergency Department (A&E), such as St Thomas' Hospital A&E or University College Hospital A&E, London.",
+      "severity_assessment": "High: Sudden crushing substernal chest pain radiating to the left arm accompanied by shortness of breath constitutes a life-threatening medical emergency.",
+      "follow_up_plan": "Dial 999 immediately. Do not attempt to drive or travel unassisted. Sit quietly in a supported upright posture, loosen restrictive clothing, unlock the front entrance if safe to do so, and await paramedic arrival."
+    }
+  },
+  {
+    "id": "case-3",
+    "name": "All agents called (pipeline coverage)",
+    "input": {
+      "patientName": "Coverage Probe",
+      "name": "Coverage Probe",
+      "symptoms": "headache and nausea for two days",
+      "location": "Tampines, Singapore"
+    },
+    "criteria": [
+      "conclusion summarizes the patient's symptoms (Front-Desk-Agent ran)",
+      "recommended_clinic names at least one real clinic or hospital (Clinic-Seeker-Agent ran)",
+      "OTC_medication_recommended lists at least one over-the-counter medication (Pharmacy-Guide-Agent ran)",
+      "severity_assessment states a Low/Medium/High level with justification (Risk-Assessment-Agent ran)",
+      "follow_up_plan provides a post-consultation care plan (Follow-Up-Agent ran)"
+    ],
+    "response": {
+      "conclusion": "Patient Coverage Probe located in Tampines, Singapore presents with headache and mild-to-moderate nausea persisting continuously over a two-day duration.",
+      "OTC_medication_recommended": "Paracetamol 500mg to 1000mg every 6 hours as needed for headache (max 4000mg/24h) and oral rehydration salts (ORS) to prevent electrolyte depletion from nausea.",
+      "food_recommended": "Light, bland nourishment including plain congee, toasted bread, soda crackers, and ripe bananas in small frequent portions.",
+      "food_restricted": "Heavily fried, greasy, acidic, or intensely fragrant meals that trigger gastric reflux or worsen nausea.",
+      "drink_recommended": "Clear fluids sipped slowly: electrolyte hydration drinks, diluted apple juice, warm ginger infusion, and room-temperature water.",
+      "drink_restricted": "Caffeinated coffee, alcoholic beverages, and high-sugar carbonated sodas.",
+      "recommended_clinic": "Tampines Polyclinic, 1 Tampines Street 41, Singapore 529203; or Changi General Hospital Emergency Department (2 Simei Street 3) if acute neurological symptoms emerge.",
+      "severity_assessment": "Medium: Headache accompanied by two days of persistent nausea warrants clinical outpatient evaluation to differentiate tension headache, migraine, or viral gastroenteritis from elevated intracranial pressure.",
+      "follow_up_plan": "Rest in a quiet, low-stimulus environment, maintain continuous hydration, and consult a general practitioner at Tampines Polyclinic within 24 hours. Seek immediate emergency evaluation if intractable vomiting, neck stiffness, photophobia, confusion, or focal motor deficits occur."
+    }
+  }
+]

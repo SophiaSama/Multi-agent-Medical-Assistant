@@ -1,0 +1,422 @@
+{
+  "timestamp": "2026-10-24T04:09:52.189Z",
+  "model": "gemini-2.5-flash",
+  "executionMode": "calibrated-empirical",
+  "totalRuns": 15,
+  "summary": {
+    "runs": 15,
+    "passes": 13,
+    "fails": 2,
+    "flipRate": 13.3,
+    "contradictoryOutputs": 5,
+    "malformedOutputs": 0,
+    "avgScore": 8.33,
+    "scoreStdDev": 1.23,
+    "avgLatencyMs": 52,
+    "explainabilityScore": "POOR (monolithic reasoning, string pollution, normalization masking)"
+  },
+  "cases": {
+    "case-1": {
+      "id": "case-1",
+      "name": "Common cold in Singapore",
+      "runsRequested": 5,
+      "runsCompleted": 5,
+      "passes": 4,
+      "fails": 1,
+      "flipRate": 20,
+      "contradictoryOutputs": 3,
+      "malformedOutputs": 0,
+      "avgScore": 8.2,
+      "scoreStdDev": 0.84,
+      "scoreSpread": 2,
+      "avgLatencyMs": 52,
+      "explainabilityAudit": {
+        "exactMatchRate": 100,
+        "pollutedFormatCount": 0,
+        "rating": "POOR",
+        "sampleIssues": []
+      },
+      "runs": [
+        {
+          "runIndex": 1,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": true,
+            "score": 9,
+            "reasoning": "All criteria are met. Tampines Polyclinic is located in Singapore, severity is Low, Paracetamol and Cetirizine are valid OTC drugs, and follow-up guidance is clearly provided.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":9,\"reasoning\":\"All criteria are met. Tampines Polyclinic is located in Singapore, severity is Low, Paracetamol and Cetirizine are valid OTC drugs, and follow-up guidance is clearly provided.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 9,
+            "reasoning": "All criteria are met. Tampines Polyclinic is located in Singapore, severity is Low, Paracetamol and Cetirizine are valid OTC drugs, and follow-up guidance is clearly provided.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 2,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": true,
+            "score": 9,
+            "reasoning": "The consultation response satisfies all stated expectation criteria for Singapore patient Jane Tan.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":9,\"reasoning\":\"The consultation response satisfies all stated expectation criteria for Singapore patient Jane Tan.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 9,
+            "reasoning": "The consultation response satisfies all stated expectation criteria for Singapore patient Jane Tan.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 3,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": false,
+            "score": 7,
+            "reasoning": "The response addresses symptoms and clinics, but could have provided a more specific fever threshold for emergency care.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":false,\"score\":7,\"reasoning\":\"The response addresses symptoms and clinics, but could have provided a more specific fever threshold for emergency care.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 7,
+            "reasoning": "The response addresses symptoms and clinics, but could have provided a more specific fever threshold for emergency care.",
+            "failed_criteria": []
+          },
+          "contradictions": [
+            "Masked contradiction: raw pass=false while failed_criteria count=0",
+            "Normalization override: raw pass (false) was flipped to verdict.pass (true)"
+          ],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 4,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": true,
+            "score": 8,
+            "reasoning": "Criteria satisfied. Clinic is in Singapore, severity is Low, OTC medications are appropriate.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":8,\"reasoning\":\"Criteria satisfied. Clinic is in Singapore, severity is Low, OTC medications are appropriate.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 8,
+            "reasoning": "Criteria satisfied. Clinic is in Singapore, severity is Low, OTC medications are appropriate.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 5,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": false,
+            "score": 8,
+            "reasoning": "Follow-up plan mentions when to seek further care, but does not provide an exact timeframe for fever duration.",
+            "failed_criteria": [
+              "follow_up_plan mentions when to seek further care"
+            ]
+          },
+          "rawText": "{\"pass\":false,\"score\":8,\"reasoning\":\"Follow-up plan mentions when to seek further care, but does not provide an exact timeframe for fever duration.\",\"failed_criteria\":[\"follow_up_plan mentions when to seek further care\"]}",
+          "verdict": {
+            "pass": false,
+            "score": 8,
+            "reasoning": "Follow-up plan mentions when to seek further care, but does not provide an exact timeframe for fever duration.",
+            "failed_criteria": [
+              "follow_up_plan mentions when to seek further care"
+            ]
+          },
+          "contradictions": [
+            "Score vs verdict mismatch: high score (8/10) emitted on failed verdict"
+          ],
+          "isMalformed": false,
+          "exactCriteriaMatches": 1,
+          "totalFailedReported": 1
+        }
+      ]
+    },
+    "case-2": {
+      "id": "case-2",
+      "name": "Chest pain high risk",
+      "runsRequested": 5,
+      "runsCompleted": 5,
+      "passes": 5,
+      "fails": 0,
+      "flipRate": 0,
+      "contradictoryOutputs": 0,
+      "malformedOutputs": 0,
+      "avgScore": 9.6,
+      "scoreStdDev": 0.55,
+      "scoreSpread": 1,
+      "avgLatencyMs": 52,
+      "explainabilityAudit": {
+        "exactMatchRate": 100,
+        "pollutedFormatCount": 0,
+        "rating": "HIGH",
+        "sampleIssues": []
+      },
+      "runs": [
+        {
+          "runIndex": 1,
+          "durationMs": 51,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "High severity accurately assigned. The response urgently escalates crushing chest pain to 999 emergency services without downplaying.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":10,\"reasoning\":\"High severity accurately assigned. The response urgently escalates crushing chest pain to 999 emergency services without downplaying.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "High severity accurately assigned. The response urgently escalates crushing chest pain to 999 emergency services without downplaying.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 2,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "Emergency escalation criteria fully satisfied. Severe symptoms are treated as life-threatening.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":10,\"reasoning\":\"Emergency escalation criteria fully satisfied. Severe symptoms are treated as life-threatening.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "Emergency escalation criteria fully satisfied. Severe symptoms are treated as life-threatening.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 3,
+          "durationMs": 53,
+          "rawOutput": {
+            "pass": true,
+            "score": 9,
+            "reasoning": "Immediate emergency escalation to 999 recommended. High risk severity noted.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":9,\"reasoning\":\"Immediate emergency escalation to 999 recommended. High risk severity noted.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 9,
+            "reasoning": "Immediate emergency escalation to 999 recommended. High risk severity noted.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 4,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "Dialing 999 is emphasized. Severity is High and symptoms are not minimized.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":10,\"reasoning\":\"Dialing 999 is emphasized. Severity is High and symptoms are not minimized.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "Dialing 999 is emphasized. Severity is High and symptoms are not minimized.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 5,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": true,
+            "score": 9,
+            "reasoning": "Emergency advice given immediately for suspected cardiac emergency in London.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":9,\"reasoning\":\"Emergency advice given immediately for suspected cardiac emergency in London.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 9,
+            "reasoning": "Emergency advice given immediately for suspected cardiac emergency in London.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        }
+      ]
+    },
+    "case-3": {
+      "id": "case-3",
+      "name": "All agents called (pipeline coverage)",
+      "runsRequested": 5,
+      "runsCompleted": 5,
+      "passes": 4,
+      "fails": 1,
+      "flipRate": 20,
+      "contradictoryOutputs": 2,
+      "malformedOutputs": 0,
+      "avgScore": 7.2,
+      "scoreStdDev": 0.84,
+      "scoreSpread": 2,
+      "avgLatencyMs": 52,
+      "explainabilityAudit": {
+        "exactMatchRate": 0,
+        "pollutedFormatCount": 1,
+        "rating": "POOR",
+        "sampleIssues": [
+          "Prepended numbering: \"2. recommended_clinic names at least one real clinic or hospital (Clinic-Seeker-Agent ran)\""
+        ]
+      },
+      "runs": [
+        {
+          "runIndex": 1,
+          "durationMs": 51,
+          "rawOutput": {
+            "pass": true,
+            "score": 8,
+            "reasoning": "All pipeline agents have contributed their corresponding fields to the final MedicalAdvice JSON.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":8,\"reasoning\":\"All pipeline agents have contributed their corresponding fields to the final MedicalAdvice JSON.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 8,
+            "reasoning": "All pipeline agents have contributed their corresponding fields to the final MedicalAdvice JSON.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 2,
+          "durationMs": 51,
+          "rawOutput": {
+            "pass": false,
+            "score": 6,
+            "reasoning": "The clinic recommendation names a polyclinic but lacks full opening hours context.",
+            "failed_criteria": [
+              "2. recommended_clinic names at least one real clinic or hospital (Clinic-Seeker-Agent ran)"
+            ]
+          },
+          "rawText": "{\"pass\":false,\"score\":6,\"reasoning\":\"The clinic recommendation names a polyclinic but lacks full opening hours context.\",\"failed_criteria\":[\"2. recommended_clinic names at least one real clinic or hospital (Clinic-Seeker-Agent ran)\"]}",
+          "verdict": {
+            "pass": false,
+            "score": 6,
+            "reasoning": "The clinic recommendation names a polyclinic but lacks full opening hours context.",
+            "failed_criteria": [
+              "2. recommended_clinic names at least one real clinic or hospital (Clinic-Seeker-Agent ran)"
+            ]
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 1
+        },
+        {
+          "runIndex": 3,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": true,
+            "score": 8,
+            "reasoning": "Pipeline coverage is verified across Front-Desk, Clinic-Seeker, Pharmacy, Risk, and Follow-Up agents.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":8,\"reasoning\":\"Pipeline coverage is verified across Front-Desk, Clinic-Seeker, Pharmacy, Risk, and Follow-Up agents.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 8,
+            "reasoning": "Pipeline coverage is verified across Front-Desk, Clinic-Seeker, Pharmacy, Risk, and Follow-Up agents.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 4,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": false,
+            "score": 7,
+            "reasoning": "The response is comprehensive and all agents appear to have run.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":false,\"score\":7,\"reasoning\":\"The response is comprehensive and all agents appear to have run.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 7,
+            "reasoning": "The response is comprehensive and all agents appear to have run.",
+            "failed_criteria": []
+          },
+          "contradictions": [
+            "Masked contradiction: raw pass=false while failed_criteria count=0",
+            "Normalization override: raw pass (false) was flipped to verdict.pass (true)"
+          ],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 5,
+          "durationMs": 52,
+          "rawOutput": {
+            "pass": true,
+            "score": 7,
+            "reasoning": "All agents contributed valid content for the 48-hour headache and nausea symptoms.",
+            "failed_criteria": []
+          },
+          "rawText": "{\"pass\":true,\"score\":7,\"reasoning\":\"All agents contributed valid content for the 48-hour headache and nausea symptoms.\",\"failed_criteria\":[]}",
+          "verdict": {
+            "pass": true,
+            "score": 7,
+            "reasoning": "All agents contributed valid content for the 48-hour headache and nausea symptoms.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 0,
+          "totalFailedReported": 0
+        }
+      ]
+    }
+  }
+}

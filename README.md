@@ -83,7 +83,7 @@ npm run clean     # Remove dist/
 | Variable | Scope | Required | Purpose |
 |----------|-------|----------|---------|
 | `GEMINI_API_KEY` | Backend | Yes | Gemini API access |
-| `GOOGLE_MAPS_PLATFORM_KEY` | Backend | Yes | Google Places autocomplete |
+| `GOOGLE_MAPS_PLATFORM_KEY` | Backend | Yes | Places API (New) autocomplete + clinic lookup, proxied via `/api/places/*` (never sent to the browser) |
 | `SUPABASE_URL` | Backend | Yes | Server Supabase project URL |
 | `SUPABASE_SECRET_API_KEY` | Backend | Yes* | Read/write `medical_records` (bypasses RLS). `SUPABASE_SERVICE_ROLE_KEY` accepted as fallback |
 | `VITE_SUPABASE_URL` | Frontend | Yes | Supabase URL for the browser auth client |

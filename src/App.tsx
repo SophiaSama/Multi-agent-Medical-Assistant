@@ -1,156 +1,171 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Bot, User, Stethoscope, Pill, Locate, Coffee, ShieldAlert, ChevronRight, Apple, Activity, Key, ClipboardList, LogOut, MapPin, Star, Phone, Clock, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useRef, useId } from 'react';
+import { Bot, User, Stethoscope, Pill, Locate, Coffee, ShieldAlert, ChevronRight, Apple, Activity, ClipboardList, LogOut, MapPin, Star, Phone, Clock, ExternalLink } from 'lucide-react';
 import { MedicalAdvice } from './types.ts';
 import { motion, AnimatePresence } from 'motion/react';
-import { APIProvider, useMapsLibrary, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
 import { supabase, isSupabaseConfigured } from './lib/supabaseClient.ts';
 import Auth from './Auth.tsx';
 
-const API_KEY =
-  (import.meta as any).env?.VITE_GOOGLE_MAPS_PLATFORM_KEY ||
-  (typeof process !== 'undefined' ? (process.env as any)?.GOOGLE_MAPS_PLATFORM_KEY : undefined) ||
-  (globalThis as any).GOOGLE_MAPS_PLATFORM_KEY ||
-  '';
-const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
+// Google Maps Platform access is proxied through the Express backend
+// (/api/places/*) so the API key never reaches the browser.
+
+interface PlaceSuggestion {
+  placeId: string;
+  text: string;
+  mainText?: string;
+  secondaryText?: string;
+}
+
+interface ClinicPlace {
+  name: string;
+  address?: string;
+  lat: number;
+  lng: number;
+  rating?: number;
+  userRatingCount?: number;
+  phone?: string;
+  googleMapsUri?: string;
+  openNow?: boolean;
+}
 
 function LocationInput({ value, onChange }: { value: string, onChange: (val: string) => void }) {
-  const placesLib = useMapsLibrary('places');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const elementRef = useRef<any>(null);
-  // Keep the latest onChange without re-running the setup effect.
-  const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  const listId = useId();
+  const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
+  const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [announcement, setAnnouncement] = useState('');
+  // Set when the value changes because the user picked a suggestion, so we
+  // don't immediately re-query for the text we just committed.
+  const skipNextFetch = useRef(false);
+  // One session token per typing session groups autocomplete requests for billing.
+  const sessionToken = useRef<string>(crypto.randomUUID());
 
   useEffect(() => {
-    if (!placesLib || !containerRef.current) return;
-
-    const PlaceAutocompleteElement = (placesLib as any).PlaceAutocompleteElement;
-    if (!PlaceAutocompleteElement) {
-      console.error('[LocationInput] PlaceAutocompleteElement not available in places library');
+    if (skipNextFetch.current) {
+      skipNextFetch.current = false;
       return;
     }
-
-    // Create the official autocomplete element programmatically. This widget
-    // renders its own text input, manages the dropdown, and commits the chosen
-    // value into its input on selection (fixing "selection doesn't stick").
-    const el = new PlaceAutocompleteElement();
-    el.style.width = '100%';
-    el.style.display = 'block';
-    elementRef.current = el;
-    containerRef.current.appendChild(el);
-
-    const handleSelect = async (event: any) => {
+    const input = value.trim();
+    if (input.length < 3) {
+      setSuggestions([]);
+      setOpen(false);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
       try {
-        const placePrediction = event.placePrediction || event.detail?.placePrediction;
-        if (!placePrediction) {
-          console.warn('[LocationInput] gmp-select fired without a placePrediction', event);
-          return;
+        const res = await fetch('/api/places/autocomplete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input, sessionToken: sessionToken.current }),
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: { suggestions: PlaceSuggestion[] } = await res.json();
+        setSuggestions(data.suggestions);
+        setActiveIndex(-1);
+        setOpen(data.suggestions.length > 0);
+        setAnnouncement(
+          data.suggestions.length
+            ? `${data.suggestions.length} location suggestions available.`
+            : '',
+        );
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          // Autocomplete is a convenience: on failure the field still accepts free text.
+          console.warn('[LocationInput] autocomplete unavailable:', err);
+          setSuggestions([]);
+          setOpen(false);
         }
-        const place = placePrediction.toPlace();
-        await place.fetchFields({ fields: ['formattedAddress', 'displayName'] });
-        const displayText =
-          place.formattedAddress ||
-          (typeof place.displayName === 'string' ? place.displayName : place.displayName?.text) ||
-          '';
-        console.log('[LocationInput] Selection successful:', displayText);
-        onChangeRef.current(displayText);
-      } catch (err) {
-        console.error('[LocationInput] Place fetch error:', err);
       }
-    };
-
-    el.addEventListener('gmp-select', handleSelect);
-
+    }, 300);
     return () => {
-      el.removeEventListener('gmp-select', handleSelect);
-      el.remove();
-      elementRef.current = null;
+      clearTimeout(timer);
+      controller.abort();
     };
-  }, [placesLib]);
+  }, [value]);
 
-  if (!placesLib) {
-    return <div className="h-[46px] w-full bg-pine/5 animate-pulse rounded-xl border border-ink/10" />;
-  }
+  const select = (s: PlaceSuggestion) => {
+    skipNextFetch.current = true;
+    onChange(s.text);
+    setOpen(false);
+    setSuggestions([]);
+    setActiveIndex(-1);
+    sessionToken.current = crypto.randomUUID();
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!open || suggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex(i => (i + 1) % suggestions.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex(i => (i <= 0 ? suggestions.length - 1 : i - 1));
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault(); // pick the suggestion instead of submitting the form
+      select(suggestions[activeIndex]);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setOpen(false);
+    }
+  };
+
+  const optionId = (i: number) => `${listId}-opt-${i}`;
 
   return (
-    <div className="relative medical-location-input min-h-[46px] z-[60]">
-      <div ref={containerRef} style={{ width: '100%' }} />
-      <style>{`
-        gmp-place-autocomplete::part(input) {
-          width: 100%;
-          padding: 0.65rem 0.85rem 0.65rem 2.4rem;
-          border: 1px solid rgba(27, 39, 35, 0.12);
-          border-radius: 0.75rem;
-          font-size: 0.9rem;
-          color: #1b2723;
-          background-color: rgba(245, 241, 232, 0.55);
-          transition: all 0.2s ease;
-          box-sizing: border-box;
-        }
-        gmp-place-autocomplete::part(input)::placeholder {
-          color: rgba(27, 39, 35, 0.4);
-        }
-        gmp-place-autocomplete::part(input):focus {
-          border-color: #0f4c45;
-          background-color: #ffffff;
-          box-shadow: 0 0 0 4px rgba(15, 76, 69, 0.12);
-          outline: none;
-        }
-        .medical-location-input::before {
-          content: '';
-          position: absolute;
-          left: 0.85rem;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 1rem;
-          height: 1rem;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230f4c45' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z'%3E%3C/path%3E%3Ccircle cx='12' cy='10' r='3'%3E%3C/circle%3E%3C/svg%3E");
-          background-size: contain;
-          background-repeat: no-repeat;
-          z-index: 100;
-          pointer-events: none;
-        }
-      `}</style>
+    <div className="relative z-[60]">
+      <MapPin className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-pine" aria-hidden="true" />
+      <input
+        id="location"
+        type="text"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded={open}
+        aria-controls={listId}
+        aria-activedescendant={open && activeIndex >= 0 ? optionId(activeIndex) : undefined}
+        autoComplete="off"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
+        onFocus={() => suggestions.length > 0 && setOpen(true)}
+        // Delay so a click on an option registers before the list closes.
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        className="field block w-full py-2.5 pl-10 pr-3 text-sm"
+        placeholder="Start typing an address or area..."
+      />
+      <ul
+        id={listId}
+        role="listbox"
+        aria-label="Location suggestions"
+        hidden={!open}
+        className="absolute left-0 right-0 mt-1 max-h-64 overflow-auto rounded-xl border border-ink/10 bg-white shadow-lg py-1"
+      >
+        {suggestions.map((s, i) => (
+          <li
+            key={s.placeId}
+            id={optionId(i)}
+            role="option"
+            aria-selected={i === activeIndex}
+            // mousedown fires before the input's blur.
+            onMouseDown={e => {
+              e.preventDefault();
+              select(s);
+            }}
+            onMouseEnter={() => setActiveIndex(i)}
+            className={`cursor-pointer px-3 py-2 text-sm ${i === activeIndex ? 'bg-pine/10' : ''}`}
+          >
+            <span className="block font-medium text-ink">{s.mainText || s.text}</span>
+            {s.secondaryText && <span className="block text-xs text-ink/55">{s.secondaryText}</span>}
+          </li>
+        ))}
+      </ul>
+      <p className="sr-only" aria-live="polite">{announcement}</p>
     </div>
   );
 }
 
 export default function App() {
-  if (!hasValidKey) {
-    return (
-      <div className="app-shell min-h-screen flex items-center justify-center p-4 font-sans text-ink">
-        <div className="surface relative z-10 max-w-lg w-full rounded-3xl p-8 sm:p-10">
-          <div className="w-12 h-12 bg-gold/15 text-gold rounded-2xl flex items-center justify-center mb-6">
-            <Key size={24} />
-          </div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-sage mb-2">Setup required</p>
-          <h2 className="text-3xl font-display font-semibold text-ink mb-3 leading-tight">Google Maps API Key Required</h2>
-          <p className="text-ink/60 mb-6 leading-relaxed">
-            To enable precise location features, this application requires a Google Maps Platform API key.
-          </p>
-          <div className="space-y-4">
-            <p className="text-sm"><strong>Step 1:</strong> <a href="https://console.cloud.google.com/google/maps-apis/start?utm_campaign=gmp-code-assist-ais" target="_blank" rel="noopener" className="text-pine font-semibold hover:underline">Get an API Key</a></p>
-            <div>
-              <p className="text-sm font-semibold mb-2">Step 2: Add your key as a secret:</p>
-              <ul className="text-sm text-ink/70 space-y-2 list-disc pl-5">
-                <li>Open <strong>Settings</strong> (⚙️ gear icon, <strong>top-right corner</strong>)</li>
-                <li>Select <strong>Secrets</strong></li>
-                <li>Type <code className="bg-mist px-1.5 py-0.5 rounded text-pine font-semibold">GOOGLE_MAPS_PLATFORM_KEY</code> as the secret name, press <strong>Enter</strong></li>
-                <li>Paste your API key as the value, press <strong>Enter</strong></li>
-              </ul>
-            </div>
-            <p className="text-sm text-ink/50 italic mt-4">The app will rebuild automatically.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <APIProvider apiKey={API_KEY} version="weekly">
-      <MainApp />
-    </APIProvider>
-  );
+  return <MainApp />;
 }
 
 function MainApp() {
@@ -572,72 +587,36 @@ function MainApp() {
 }
 
 function ClinicMap({ clinicName, location }: { clinicName: string; location: string }) {
-  const placesLib = useMapsLibrary('places');
-  const [place, setPlace] = useState<any>(null);
-  const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
+  const [place, setPlace] = useState<ClinicPlace | null>(null);
   const [status, setStatus] = useState<'loading' | 'ok' | 'empty' | 'error'>('loading');
-  const [showInfo, setShowInfo] = useState(true);
 
   useEffect(() => {
-    if (!placesLib || !clinicName) return;
-    let cancelled = false;
+    if (!clinicName) return;
+    const controller = new AbortController();
 
     (async () => {
       setStatus('loading');
       setPlace(null);
-      setPosition(null);
       try {
-        const Place = (placesLib as any).Place;
-        if (!Place || typeof Place.searchByText !== 'function') {
-          console.error('[ClinicMap] Place.searchByText not available');
-          if (!cancelled) setStatus('error');
-          return;
-        }
-
-        // Use only the first listed clinic for a tighter search query.
-        const primaryClinic = clinicName.split(/[\n;]|,(?=\s*[A-Z])/)[0].trim() || clinicName;
-        const textQuery = location ? `${primaryClinic} near ${location}` : primaryClinic;
-
-        const { places } = await Place.searchByText({
-          textQuery,
-          fields: [
-            'displayName',
-            'formattedAddress',
-            'location',
-            'rating',
-            'userRatingCount',
-            'nationalPhoneNumber',
-            'googleMapsURI',
-            'regularOpeningHours',
-          ],
-          maxResultCount: 1,
+        const res = await fetch('/api/places/clinic', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clinicName, location }),
+          signal: controller.signal,
         });
-
-        if (cancelled) return;
-
-        if (places && places.length > 0) {
-          const p = places[0];
-          const loc = p.location;
-          const lat = typeof loc?.lat === 'function' ? loc.lat() : loc?.lat;
-          const lng = typeof loc?.lng === 'function' ? loc.lng() : loc?.lng;
-          setPlace(p);
-          if (typeof lat === 'number' && typeof lng === 'number') {
-            setPosition({ lat, lng });
-          }
-          setStatus('ok');
-        } else {
-          setStatus('empty');
-        }
-      } catch (err) {
-        console.error('[ClinicMap] searchByText error:', err);
-        if (!cancelled) setStatus('error');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data: { place: ClinicPlace | null } = await res.json();
+        setPlace(data.place);
+        setStatus(data.place ? 'ok' : 'empty');
+      } catch (err: any) {
+        if (err?.name === 'AbortError') return;
+        console.error('[ClinicMap] clinic lookup error:', err);
+        setStatus('error');
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
-  }, [placesLib, clinicName, location]);
+    return () => controller.abort();
+  }, [clinicName, location]);
 
   if (status === 'loading') {
     return (
@@ -649,7 +628,7 @@ function ClinicMap({ clinicName, location }: { clinicName: string; location: str
     );
   }
 
-  if (status !== 'ok' || !position) {
+  if (status !== 'ok' || !place) {
     return (
       <div className="mt-3 p-3 rounded-xl bg-mist border border-ink/10 text-xs text-ink/55 flex items-center gap-2">
         <MapPin className="w-4 h-4 text-clay" />
@@ -660,49 +639,28 @@ function ClinicMap({ clinicName, location }: { clinicName: string; location: str
     );
   }
 
-  const name =
-    typeof place?.displayName === 'string'
-      ? place.displayName
-      : place?.displayName?.text || clinicName;
-  const address = place?.formattedAddress as string | undefined;
-  const rating = place?.rating as number | undefined;
-  const ratingCount = place?.userRatingCount as number | undefined;
-  const phone = place?.nationalPhoneNumber as string | undefined;
-  const mapsUri = place?.googleMapsURI as string | undefined;
-  const openNow: boolean | undefined =
-    typeof place?.regularOpeningHours?.openNow === 'boolean'
-      ? place.regularOpeningHours.openNow
-      : undefined;
+  const { name, address, rating, userRatingCount: ratingCount, phone, openNow } = place;
+  // Fall back to a keyless Google Maps search URL if Places didn't return one.
+  const mapsUri =
+    place.googleMapsUri ||
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.lat},${place.lng}`)}`;
+  // Keyless OpenStreetMap embed centred on the clinic with a marker.
+  const d = 0.006;
+  const osmSrc =
+    `https://www.openstreetmap.org/export/embed.html?layer=mapnik` +
+    `&bbox=${place.lng - d},${place.lat - d},${place.lng + d},${place.lat + d}` +
+    `&marker=${place.lat},${place.lng}`;
 
   return (
     <div className="mt-3 space-y-3">
       <div className="h-[260px] w-full rounded-xl overflow-hidden border border-ink/10 shadow-sm">
-        <Map
-          defaultCenter={position}
-          defaultZoom={15}
-          gestureHandling="cooperative"
-          disableDefaultUI={false}
-          clickableIcons={false}
-          style={{ width: '100%', height: '100%' }}
-        >
-          <Marker position={position} title={name} onClick={() => setShowInfo(true)} />
-          {showInfo && (
-            <InfoWindow position={position} onCloseClick={() => setShowInfo(false)} ariaLabel={name}>
-              <div className="max-w-[220px] text-[#1b2723]">
-                <h2 className="font-semibold text-sm mb-1">{name}</h2>
-                {address && <p className="text-xs text-[#1b2723]/70 leading-snug">{address}</p>}
-                {typeof rating === 'number' && (
-                  <p className="text-xs mt-1 flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-current text-amber-500" /> {rating.toFixed(1)}
-                    {typeof ratingCount === 'number' && (
-                      <span className="text-[#1b2723]/50"> ({ratingCount})</span>
-                    )}
-                  </p>
-                )}
-              </div>
-            </InfoWindow>
-          )}
-        </Map>
+        <iframe
+          title={`Map showing ${name}`}
+          src={osmSrc}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          className="w-full h-full border-0"
+        />
       </div>
 
       {/* Place details panel */}
@@ -732,16 +690,14 @@ function ClinicMap({ clinicName, location }: { clinicName: string; location: str
               <Phone className="w-3.5 h-3.5" /> {phone}
             </a>
           )}
-          {mapsUri && (
-            <a
-              href={mapsUri}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-pine hover:underline font-medium"
-            >
-              <ExternalLink className="w-3.5 h-3.5" /> Open in Google Maps
-            </a>
-          )}
+          <a
+            href={mapsUri}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-pine hover:underline font-medium"
+          >
+            <ExternalLink className="w-3.5 h-3.5" /> Open in Google Maps
+          </a>
         </div>
       </div>
     </div>
