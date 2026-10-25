@@ -1,6 +1,6 @@
 # HealthAgent AI — Agent Instructions
 
-Multi-agent medical consultation app: React 19 + Vite frontend, Express.js backend, Google Gemini multi-agent orchestration, Supabase auth + persistence, Google Places autocomplete (server-proxied).
+Multi-agent medical consultation app: React 19 + Vite frontend, Express.js backend, Google Gemini multi-agent orchestration, Supabase auth + persistence, Google Maps Places autocomplete.
 
 ## Commands
 
@@ -14,7 +14,7 @@ npm run clean     # Remove dist/
 
 ## Architecture
 
-All six AI agents live in `server.ts` as instances of a lightweight `Agent` class (a thin ADK-style wrapper over the `@google/genai` Interactions API). They run against `process.env.GEMINI_MODEL` (defaulting to `gemini-3.5-flash-lite`).
+All six AI agents live in `server.ts` as instances of a lightweight `Agent` class (a thin ADK-style wrapper over the `@google/genai` Interactions API). They run against `process.env.GEMINI_MODEL`.
 
 | Agent | Role |
 |-------|------|
@@ -44,7 +44,6 @@ Node's global `fetch` (undici) may not trust a corporate TLS-intercepting proxy'
 - `src/Auth.tsx` — Supabase email/password sign-in & sign-up UI
 - `src/lib/supabaseClient.ts` — Browser Supabase client (anon key only, RLS-safe)
 - `src/types.ts` — Shared types (`MedicalAdvice`, `PatientRecord`)
-- `src/places.ts` — Server-side Places API (New) proxy (autocomplete, clinic text search); the Maps key stays on the server
 - `supabase/migrations/` — DB schema (table: `medical_records`)
 - `.env.example` — Documented environment variables
 
@@ -55,8 +54,8 @@ Node's global `fetch` (undici) may not trust a corporate TLS-intercepting proxy'
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `GEMINI_API_KEY` | Yes | Gemini API access |
-| `GEMINI_MODEL` | No | Gemini model name (defaults to `gemini-3.5-flash-lite`) |
-| `GOOGLE_MAPS_PLATFORM_KEY` | Yes | Places API (New) — autocomplete + clinic lookup via the server proxy `/api/places/*`; never exposed to the client |
+| `GEMINI_MODEL` | Yes | Gemini model name for consultation agents |
+| `GEMINI_JUDGE_MODEL` | No | Gemini model name for evaluation/judge scripts |
 | `SUPABASE_URL` | Yes | Server Supabase project URL |
 | `SUPABASE_SECRET_API_KEY` | Yes* | Server key for `medical_records` read/write (bypasses RLS); `SUPABASE_SERVICE_ROLE_KEY` is accepted as a fallback |
 | `EXTRA_CA_CERTS` | No | Path to a PEM CA bundle; set only behind a TLS-intercepting proxy |
@@ -69,6 +68,7 @@ Node's global `fetch` (undici) may not trust a corporate TLS-intercepting proxy'
 |----------|----------|---------|
 | `VITE_SUPABASE_URL` | Yes | Supabase project URL for the browser auth client |
 | `VITE_SUPABASE_ANON_KEY` | Yes | Public anon key for auth (never the service/secret key) |
+| `VITE_GOOGLE_MAPS_PLATFORM_KEY` | Yes | Browser key for Maps JavaScript API + Places API (New), restricted by HTTP referrer |
 
 ## Conventions
 
@@ -82,4 +82,4 @@ Node's global `fetch` (undici) may not trust a corporate TLS-intercepting proxy'
 
 ## Stack
 
-React 19 · Vite 6 · Express 4 · `@google/genai` · `@supabase/supabase-js` · Tailwind CSS v4 · `motion` · `lucide-react` · `undici` (CA dispatcher) · `tsx` (dev) · `esbuild` (backend build)
+React 19 · Vite 6 · Express 4 · `@google/genai` · `@supabase/supabase-js` · `@vis.gl/react-google-maps` · Tailwind CSS v4 · `motion` · `lucide-react` · `undici` (CA dispatcher) · `tsx` (dev) · `esbuild` (backend build)

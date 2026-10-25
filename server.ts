@@ -4,29 +4,6 @@ import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { runConsultation } from "@/src/consult";
-import { autocompletePlaces, searchClinic, PlacesConfigError } from "@/src/places";
-
-// Minimal per-IP fixed-window rate limit for the Places proxy, so the public
-// endpoints can't be used to drain the server's Maps quota.
-const PLACES_LIMIT_PER_MIN = 60;
-const placesHits = new Map<string, { count: number; windowStart: number }>();
-function placesRateLimit(req: express.Request, res: express.Response, next: express.NextFunction) {
-  const ip = req.ip || "unknown";
-  const now = Date.now();
-  const entry = placesHits.get(ip);
-  if (!entry || now - entry.windowStart > 60_000) {
-    placesHits.set(ip, { count: 1, windowStart: now });
-    return next();
-  }
-  if (++entry.count > PLACES_LIMIT_PER_MIN) {
-    return res.status(429).json({ error: "Too many location requests, please slow down." });
-  }
-  next();
-}
-
-function placesErrorStatus(err: unknown) {
-  return err instanceof PlacesConfigError ? 503 : 502;
-}
 
 // TLS trust: behind a corporate proxy, Node's global fetch (undici) may not trust
 // the proxy's root CA, causing UNABLE_TO_GET_ISSUER_CERT_LOCALLY on HTTPS calls
@@ -69,31 +46,6 @@ async function startServer() {
     } catch (error: any) {
       console.error("[Backend Error]", error);
       res.status(500).json({ error: error.message || "Internal Server Error" });
-    }
-  });
-
-  app.post("/api/places/autocomplete", placesRateLimit, async (req, res) => {
-    const input = typeof req.body?.input === "string" ? req.body.input.trim() : "";
-    const sessionToken = typeof req.body?.sessionToken === "string" ? req.body.sessionToken.slice(0, 64) : undefined;
-    if (input.length < 3 || input.length > 200) return res.json({ suggestions: [] });
-    try {
-      res.json({ suggestions: await autocompletePlaces(input, sessionToken) });
-    } catch (err) {
-      res.status(placesErrorStatus(err)).json({ error: "Location suggestions are unavailable right now." });
-    }
-  });
-
-  app.post("/api/places/clinic", placesRateLimit, async (req, res) => {
-    const clinicName = typeof req.body?.clinicName === "string" ? req.body.clinicName.trim().slice(0, 300) : "";
-    const location = typeof req.body?.location === "string" ? req.body.location.trim().slice(0, 300) : "";
-    if (!clinicName) return res.status(400).json({ error: "clinicName is required" });
-    // Use only the first listed clinic for a tighter search query.
-    const primaryClinic = clinicName.split(/[\n;]|,(?=\s*[A-Z])/)[0].trim() || clinicName;
-    const textQuery = location ? `${primaryClinic} near ${location}` : primaryClinic;
-    try {
-      res.json({ place: await searchClinic(textQuery) });
-    } catch (err) {
-      res.status(placesErrorStatus(err)).json({ error: "Map details are unavailable right now." });
     }
   });
 

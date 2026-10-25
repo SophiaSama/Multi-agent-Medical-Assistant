@@ -48,13 +48,13 @@ The backend (`server.ts`) defines a lightweight `Agent` class wrapping the Gemin
    ```bash
    # Backend (read by the server via dotenv)
    GEMINI_API_KEY=...
-   GOOGLE_MAPS_PLATFORM_KEY=...
    SUPABASE_URL=https://<project>.supabase.co
    SUPABASE_SECRET_API_KEY=...        # server key for medical_records (bypasses RLS)
 
    # Frontend (VITE_ prefix exposes these to the browser bundle)
    VITE_SUPABASE_URL=https://<project>.supabase.co
    VITE_SUPABASE_ANON_KEY=...         # public anon key only — never the secret key
+   VITE_GOOGLE_MAPS_PLATFORM_KEY=...  # browser Maps key (restrict by HTTP referrer + API)
 
    # Optional: only if behind a TLS-intercepting corporate proxy
    EXTRA_CA_CERTS=
@@ -83,11 +83,11 @@ npm run clean     # Remove dist/
 | Variable | Scope | Required | Purpose |
 |----------|-------|----------|---------|
 | `GEMINI_API_KEY` | Backend | Yes | Gemini API access |
-| `GOOGLE_MAPS_PLATFORM_KEY` | Backend | Yes | Places API (New) autocomplete + clinic lookup, proxied via `/api/places/*` (never sent to the browser) |
 | `SUPABASE_URL` | Backend | Yes | Server Supabase project URL |
 | `SUPABASE_SECRET_API_KEY` | Backend | Yes* | Read/write `medical_records` (bypasses RLS). `SUPABASE_SERVICE_ROLE_KEY` accepted as fallback |
 | `VITE_SUPABASE_URL` | Frontend | Yes | Supabase URL for the browser auth client |
 | `VITE_SUPABASE_ANON_KEY` | Frontend | Yes | Public anon key for auth |
+| `VITE_GOOGLE_MAPS_PLATFORM_KEY` | Frontend | Yes | Browser key for Maps JavaScript API + Places API (New), restricted by HTTP referrer |
 | `EXTRA_CA_CERTS` | Backend | No | Path to a PEM CA bundle; see below |
 
 \*Without Supabase configured, the app still runs but skips patient-history read/write.

@@ -12,7 +12,7 @@ export async function runHardenedJudgeBenchmark(runsPerCase = 5): Promise<SuiteB
 
   console.log("\n================================================================================");
   console.log(` HARDENED IN-HOUSE JUDGE BENCHMARK (tests/poc/hardened-judge.ts)`);
-  console.log(` Target Model:  ${process.env.GEMINI_JUDGE_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash"}`);
+  console.log(` Target Model:  ${process.env.GEMINI_JUDGE_MODEL || "(not set)"}`);
   console.log(` Architecture:  Inverted CoT Schema + Decomposed Array + Deterministic Scoring`);
   console.log(` Execution Mode: ${hasLiveKey ? "LIVE GEMINI API" : "CALIBRATED VALIDATION"}`);
   console.log(` Repetitions:   ${runsPerCase} runs per test case on identical frozen responses`);
@@ -143,7 +143,7 @@ export async function runHardenedJudgeBenchmark(runsPerCase = 5): Promise<SuiteB
 
   const result: SuiteBenchmarkResult = {
     timestamp: new Date().toISOString(),
-    model: process.env.GEMINI_JUDGE_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model: process.env.GEMINI_JUDGE_MODEL || "",
     executionMode: hasLiveKey ? "live-gemini" : "calibrated-empirical",
     totalRuns: grandRuns,
     summary: {

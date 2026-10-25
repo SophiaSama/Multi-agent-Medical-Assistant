@@ -11,9 +11,10 @@ export async function runPromptfooBenchmark(runsPerCase = 5): Promise<SuiteBench
   const hasLiveKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.length > 5);
   const configPath = path.join(process.cwd(), "tests", "poc", "promptfoo", "promptfooconfig.yaml");
 
+  const targetProvider = process.env.GEMINI_JUDGE_MODEL ? `google:${process.env.GEMINI_JUDGE_MODEL}` : "";
   console.log("\n================================================================================");
   console.log(` PROMPTFOO BENCHMARK HARNESS (tests/poc/promptfoo/)`);
-  console.log(` Target Provider: google:gemini-2.5-flash`);
+  console.log(` Target Provider: ${targetProvider || "(not set)"}`);
   console.log(` Assertions:      Independent per-criterion llm-rubric assertions`);
   console.log(` Execution Mode:  ${hasLiveKey ? "LIVE PROMPTFOO EVALUATION" : "CALIBRATED TRACE REPLAY"}`);
   console.log(` Repetitions:     ${runsPerCase} runs per test case on identical frozen responses`);
@@ -122,7 +123,7 @@ export async function runPromptfooBenchmark(runsPerCase = 5): Promise<SuiteBench
 
   const result: SuiteBenchmarkResult = {
     timestamp: new Date().toISOString(),
-    model: "google:gemini-2.5-flash",
+    model: targetProvider,
     executionMode: hasLiveKey ? "live-gemini" : "calibrated-empirical",
     totalRuns: grandRuns,
     summary: {

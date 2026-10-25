@@ -119,7 +119,7 @@ export async function runDeepEvalBenchmark(runsPerCase = 5): Promise<SuiteBenchm
 
   const result: SuiteBenchmarkResult = {
     timestamp: new Date().toISOString(),
-    model: "gemini-2.5-flash via DeepEval Python GeminiModel",
+    model: `${process.env.GEMINI_JUDGE_MODEL || ""} via DeepEval Python GeminiModel`.trim(),
     executionMode: "calibrated-empirical",
     totalRuns: grandRuns,
     summary: {

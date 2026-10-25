@@ -244,7 +244,7 @@ export async function judgeHardened(
 ): Promise<HardenedJudgeVerdict> {
   const startTime = Date.now();
   const hasLiveKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.length > 5);
-  const modelName = process.env.GEMINI_JUDGE_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const modelName = process.env.GEMINI_JUDGE_MODEL;
 
   // Step 1: Pre-evaluate deterministic constraints in TypeScript
   const evaluations: CriterionEvaluation[] = [];
@@ -273,6 +273,9 @@ export async function judgeHardened(
   // Step 2: If there are semantic criteria, evaluate them with Gemini using inverted schema
   if (semanticCriteriaIndices.length > 0) {
     if (hasLiveKey) {
+      if (!modelName) {
+        throw new Error("GEMINI_JUDGE_MODEL environment variable is not set.");
+      }
       const ai = new GoogleGenAI({
         apiKey: process.env.GEMINI_API_KEY,
         httpOptions: { headers: { "User-Agent": "aistudio-build" } },

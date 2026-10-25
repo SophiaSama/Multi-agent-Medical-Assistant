@@ -51,8 +51,13 @@ export async function judge(
     `SYSTEM RESPONSE (MedicalAdvice JSON):\n${JSON.stringify(response, null, 2)}`,
   ].join("\n\n");
 
+  const model = process.env.GEMINI_JUDGE_MODEL;
+  if (!model) {
+    throw new Error("GEMINI_JUDGE_MODEL environment variable is not set.");
+  }
+
   const responseObj = await ai.models.generateContent({
-    model: process.env.GEMINI_JUDGE_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model,
     contents: evaluationInput,
     config: {
       systemInstruction: JUDGE_SYSTEM_INSTRUCTION,
