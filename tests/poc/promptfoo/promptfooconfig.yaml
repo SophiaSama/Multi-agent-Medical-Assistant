@@ -1,0 +1,72 @@
+description: "Promptfoo Evaluation of Frozen Medical Consultation Fixtures"
+
+prompts:
+  - "{{response}}"
+
+providers:
+  - file://fixture-provider.ts
+
+defaultTest:
+  options:
+    provider: "google:gemini-2.5-flash"
+
+tests:
+  - description: "Case 1: Common cold in Singapore"
+    vars:
+      patientName: "Jane Tan"
+      location: "Tampines, Singapore"
+      symptoms: "runny nose, mild fever, sore throat"
+      response: file://../fixtures/responses.json#0.response
+    assert:
+      - type: llm-rubric
+        value: "recommended_clinic references at least one clinic or polyclinic in or near Singapore and does NOT suggest UK/NHS 111"
+        provider: "google:gemini-2.5-flash"
+      - type: llm-rubric
+        value: "severity_assessment is Low or Medium"
+        provider: "google:gemini-2.5-flash"
+      - type: llm-rubric
+        value: "OTC_medication_recommended lists at least one over-the-counter medication"
+        provider: "google:gemini-2.5-flash"
+      - type: llm-rubric
+        value: "follow_up_plan mentions when to seek further care"
+        provider: "google:gemini-2.5-flash"
+
+  - description: "Case 2: Chest pain high risk"
+    vars:
+      patientName: "Bob Lee"
+      location: "London, UK"
+      symptoms: "sudden crushing chest pain radiating to left arm, shortness of breath"
+      response: file://../fixtures/responses.json#1.response
+    assert:
+      - type: llm-rubric
+        value: "severity_assessment is High"
+        provider: "google:gemini-2.5-flash"
+      - type: llm-rubric
+        value: "follow_up_plan or recommended_clinic advises seeking emergency care immediately"
+        provider: "google:gemini-2.5-flash"
+      - type: llm-rubric
+        value: "response does not downplay the symptoms as minor"
+        provider: "google:gemini-2.5-flash"
+
+  - description: "Case 3: All agents called (pipeline coverage)"
+    vars:
+      patientName: "Coverage Probe"
+      location: "Tampines, Singapore"
+      symptoms: "headache and nausea for two days"
+      response: file://../fixtures/responses.json#2.response
+    assert:
+      - type: llm-rubric
+        value: "conclusion summarizes the patient's symptoms (Front-Desk-Agent ran)"
+        provider: "google:gemini-2.5-flash"
+      - type: llm-rubric
+        value: "recommended_clinic names at least one real clinic or hospital (Clinic-Seeker-Agent ran)"
+        provider: "google:gemini-2.5-flash"
+      - type: llm-rubric
+        value: "OTC_medication_recommended lists at least one over-the-counter medication (Pharmacy-Guide-Agent ran)"
+        provider: "google:gemini-2.5-flash"
+      - type: llm-rubric
+        value: "severity_assessment states a Low/Medium/High level with justification (Risk-Assessment-Agent ran)"
+        provider: "google:gemini-2.5-flash"
+      - type: llm-rubric
+        value: "follow_up_plan provides a post-consultation care plan (Follow-Up-Agent ran)"
+        provider: "google:gemini-2.5-flash"

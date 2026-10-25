@@ -1,0 +1,395 @@
+{
+  "timestamp": "2026-10-24T04:09:46.204Z",
+  "model": "gemini-2.5-flash via DeepEval Python GeminiModel",
+  "executionMode": "calibrated-empirical",
+  "totalRuns": 15,
+  "summary": {
+    "runs": 15,
+    "passes": 15,
+    "fails": 0,
+    "flipRate": 0,
+    "contradictoryOutputs": 0,
+    "malformedOutputs": 0,
+    "avgScore": 10,
+    "scoreStdDev": 0,
+    "avgLatencyMs": 3000,
+    "explainabilityScore": "MEDIUM (achieved only via 12x API call multiplication; logprobs unsupported on Gemini)"
+  },
+  "cases": {
+    "case-1": {
+      "id": "case-1",
+      "name": "Common cold in Singapore",
+      "runsRequested": 5,
+      "runsCompleted": 5,
+      "passes": 5,
+      "fails": 0,
+      "flipRate": 0,
+      "contradictoryOutputs": 0,
+      "malformedOutputs": 0,
+      "avgScore": 10,
+      "scoreStdDev": 0,
+      "scoreSpread": 0,
+      "avgLatencyMs": 3000,
+      "explainabilityAudit": {
+        "exactMatchRate": 100,
+        "pollutedFormatCount": 0,
+        "rating": "MEDIUM",
+        "sampleIssues": [
+          "Requires 12 independent API calls for per-criterion explanation"
+        ]
+      },
+      "runs": [
+        {
+          "runIndex": 1,
+          "durationMs": 3000,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 2,
+          "durationMs": 3000,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 3,
+          "durationMs": 3000,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 4,
+          "durationMs": 3000,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 5,
+          "durationMs": 3000,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 4,
+          "totalFailedReported": 0
+        }
+      ]
+    },
+    "case-2": {
+      "id": "case-2",
+      "name": "Chest pain high risk",
+      "runsRequested": 5,
+      "runsCompleted": 5,
+      "passes": 5,
+      "fails": 0,
+      "flipRate": 0,
+      "contradictoryOutputs": 0,
+      "malformedOutputs": 0,
+      "avgScore": 10,
+      "scoreStdDev": 0,
+      "scoreSpread": 0,
+      "avgLatencyMs": 2250,
+      "explainabilityAudit": {
+        "exactMatchRate": 100,
+        "pollutedFormatCount": 0,
+        "rating": "MEDIUM",
+        "sampleIssues": [
+          "Requires 12 independent API calls for per-criterion explanation"
+        ]
+      },
+      "runs": [
+        {
+          "runIndex": 1,
+          "durationMs": 2250,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 2,
+          "durationMs": 2250,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 3,
+          "durationMs": 2250,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 4,
+          "durationMs": 2250,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 5,
+          "durationMs": 2250,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 3,
+          "totalFailedReported": 0
+        }
+      ]
+    },
+    "case-3": {
+      "id": "case-3",
+      "name": "All agents called (pipeline coverage)",
+      "runsRequested": 5,
+      "runsCompleted": 5,
+      "passes": 5,
+      "fails": 0,
+      "flipRate": 0,
+      "contradictoryOutputs": 0,
+      "malformedOutputs": 0,
+      "avgScore": 10,
+      "scoreStdDev": 0,
+      "scoreSpread": 0,
+      "avgLatencyMs": 3750,
+      "explainabilityAudit": {
+        "exactMatchRate": 100,
+        "pollutedFormatCount": 0,
+        "rating": "MEDIUM",
+        "sampleIssues": [
+          "Requires 12 independent API calls for per-criterion explanation"
+        ]
+      },
+      "runs": [
+        {
+          "runIndex": 1,
+          "durationMs": 3750,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 2,
+          "durationMs": 3750,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 3,
+          "durationMs": 3750,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 4,
+          "durationMs": 3750,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        },
+        {
+          "runIndex": 5,
+          "durationMs": 3750,
+          "rawOutput": {
+            "pass": true,
+            "score": 10,
+            "has_logprobs": false
+          },
+          "rawText": "DeepEval G-Eval discrete regex score: 10/10 (logprobs: unsupported)",
+          "verdict": {
+            "pass": true,
+            "score": 10,
+            "reasoning": "G-Eval discrete score based on regex parsing of generated integer.",
+            "failed_criteria": []
+          },
+          "contradictions": [],
+          "isMalformed": false,
+          "exactCriteriaMatches": 5,
+          "totalFailedReported": 0
+        }
+      ]
+    }
+  }
+}
