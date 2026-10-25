@@ -14,8 +14,10 @@ jobs:
     environment: GEMINI_API_KEY
 
     env:
-      # Backend + judge need a Gemini key. Configure as a repository secret.
+      # Backend + judge need a Gemini key and model names. Configure in repository secrets/variables.
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_MODEL: ${{ secrets.GEMINI_MODEL || vars.GEMINI_MODEL }}
+      GEMINI_JUDGE_MODEL: ${{ secrets.GEMINI_JUDGE_MODEL || vars.GEMINI_JUDGE_MODEL }}
       GOOGLE_MAPS_PLATFORM_KEY: ${{ secrets.GOOGLE_MAPS_PLATFORM_KEY }}
       # Supabase is optional — when unset the server skips history read/write.
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

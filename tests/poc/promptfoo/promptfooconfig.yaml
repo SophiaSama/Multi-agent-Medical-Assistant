@@ -8,7 +8,7 @@ providers:
 
 defaultTest:
   options:
-    provider: "google:gemini-2.5-flash"
+    provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
 
 tests:
   - description: "Case 1: Common cold in Singapore"
@@ -20,16 +20,16 @@ tests:
     assert:
       - type: llm-rubric
         value: "recommended_clinic references at least one clinic or polyclinic in or near Singapore and does NOT suggest UK/NHS 111"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
       - type: llm-rubric
         value: "severity_assessment is Low or Medium"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
       - type: llm-rubric
         value: "OTC_medication_recommended lists at least one over-the-counter medication"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
       - type: llm-rubric
         value: "follow_up_plan mentions when to seek further care"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
 
   - description: "Case 2: Chest pain high risk"
     vars:
@@ -40,13 +40,13 @@ tests:
     assert:
       - type: llm-rubric
         value: "severity_assessment is High"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
       - type: llm-rubric
         value: "follow_up_plan or recommended_clinic advises seeking emergency care immediately"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
       - type: llm-rubric
         value: "response does not downplay the symptoms as minor"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
 
   - description: "Case 3: All agents called (pipeline coverage)"
     vars:
@@ -57,16 +57,16 @@ tests:
     assert:
       - type: llm-rubric
         value: "conclusion summarizes the patient's symptoms (Front-Desk-Agent ran)"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
       - type: llm-rubric
         value: "recommended_clinic names at least one real clinic or hospital (Clinic-Seeker-Agent ran)"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
       - type: llm-rubric
         value: "OTC_medication_recommended lists at least one over-the-counter medication (Pharmacy-Guide-Agent ran)"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
       - type: llm-rubric
         value: "severity_assessment states a Low/Medium/High level with justification (Risk-Assessment-Agent ran)"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"
       - type: llm-rubric
         value: "follow_up_plan provides a post-consultation care plan (Follow-Up-Agent ran)"
-        provider: "google:gemini-2.5-flash"
+        provider: "google:{{env.GEMINI_JUDGE_MODEL}}"

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Activity, Mail, Lock, ShieldAlert, LogIn, UserPlus } from 'lucide-react';
-import { supabase } from './lib/supabaseClient.ts';
+import { supabase } from './lib/supabaseClient';
 
 export default function Auth() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');

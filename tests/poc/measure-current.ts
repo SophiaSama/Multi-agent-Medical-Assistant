@@ -360,7 +360,7 @@ export async function runCurrentJudgeBenchmark(runsPerCase = 5): Promise<SuiteBe
 
   console.log("\n================================================================================");
   console.log(` CURRENT JUDGE FRAGILITY BENCHMARK (tests/integration/judge.ts)`);
-  console.log(` Target Model:  ${process.env.GEMINI_JUDGE_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash"}`);
+  console.log(` Target Model:  ${process.env.GEMINI_JUDGE_MODEL || "(not set)"}`);
   console.log(` Execution Mode: ${hasLiveKey ? "LIVE GEMINI API" : "CALIBRATED EMPIRICAL TRACES"}`);
   console.log(` Repetitions:   ${runsPerCase} runs per test case on identical frozen responses`);
   console.log("================================================================================\n");
@@ -523,7 +523,7 @@ export async function runCurrentJudgeBenchmark(runsPerCase = 5): Promise<SuiteBe
 
   const result: SuiteBenchmarkResult = {
     timestamp: new Date().toISOString(),
-    model: process.env.GEMINI_JUDGE_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash",
+    model: process.env.GEMINI_JUDGE_MODEL || "",
     executionMode: hasLiveKey ? "live-gemini" : "calibrated-empirical",
     totalRuns: grandRuns,
     summary: {

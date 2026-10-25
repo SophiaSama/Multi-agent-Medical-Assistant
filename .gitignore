@@ -7,3 +7,6 @@ coverage/
 .env*
 !.env.example
 certs/
+.agents/
+ORIGINAL_REQUEST.md
+docs/judge-evaluation.md

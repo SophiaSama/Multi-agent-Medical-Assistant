@@ -3,14 +3,29 @@
 // (Vercel serverless function) so the agent definitions stay in one place.
 import { GoogleGenAI, Type } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
-import type { MedicalAdvice } from "@/src/types";
+import type { MedicalAdvice } from "./types.js";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: { headers: { "User-Agent": "aistudio-build" } },
-});
+let aiClient: GoogleGenAI | null = null;
+function getAi(): GoogleGenAI {
+  if (!aiClient) {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured on the server");
+    }
+    aiClient = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      httpOptions: { headers: { "User-Agent": "aistudio-build" } },
+    });
+  }
+  return aiClient;
+}
 
-const DEFAULT_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+function getDefaultModel(): string {
+  const model = process.env.GEMINI_MODEL;
+  if (!model) {
+    throw new Error("GEMINI_MODEL is not configured on the server");
+  }
+  return model;
+}
 
 // Lazy Supabase Client
 let supabaseClient: any = null;
@@ -34,8 +49,8 @@ async function runGroundedClinicSearch(location: string, symptoms: string): Prom
     ? `Find 1-2 currently open clinics or polyclinics near ${location} for a patient with these symptoms: ${symptoms}. Provide the clinic name, address, and phone number for each.`
     : `No location was provided. Advise the patient to contact their local emergency services or national medical hotline.`;
   try {
-    const response = await ai.models.generateContent({
-      model: DEFAULT_MODEL,
+    const response = await getAi().models.generateContent({
+      model: getDefaultModel(),
       contents: userMsg,
       config: {
         systemInstruction:
@@ -58,9 +73,9 @@ async function runGroundedClinicSearch(location: string, symptoms: string): Prom
 class Agent {
   name: string;
   systemInstruction: string;
-  model: string;
+  model?: string;
 
-  constructor(name: string, systemInstruction: string, model: string = DEFAULT_MODEL) {
+  constructor(name: string, systemInstruction: string, model?: string) {
     this.name = name;
     this.systemInstruction = systemInstruction;
     this.model = model;
@@ -70,8 +85,8 @@ class Agent {
     console.log(`[${this.name}] Processing...`);
     const prompt = `Context: ${JSON.stringify(context)}\n\nInput: ${input}`;
     try {
-      const response = await ai.models.generateContent({
-        model: this.model,
+      const response = await getAi().models.generateContent({
+        model: this.model || getDefaultModel(),
         contents: prompt,
         config: { systemInstruction: this.systemInstruction },
       });
@@ -105,8 +120,7 @@ const followUpAgent = new Agent(
 
 const synthesizerAgent = new Agent(
   "Synthesizer-Agent",
-  "You are the synthesis agent. Combine the outputs of the sub-agents into a final JSON structure. NEVER markdown the JSON, return raw JSON string.",
-  DEFAULT_MODEL
+  "You are the synthesis agent. Combine the outputs of the sub-agents into a final JSON structure. NEVER markdown the JSON, return raw JSON string."
 );
 
 export interface ConsultInput {
@@ -118,6 +132,9 @@ export interface ConsultInput {
 // Runs the full multi-agent consultation pipeline and persists the result.
 export async function runConsultation({ patientName, symptoms, location }: ConsultInput): Promise<MedicalAdvice> {
   console.log(`[API] New consultation request for ${patientName} at ${location || "Unknown Location"}`);
+  // Fail fast with a clear error if required Gemini env vars are missing
+  getAi();
+  getDefaultModel();
 
   // Memory Integration: Fetch past medical history from Supabase
   let pastHistory = "No prior records found.";
@@ -165,8 +182,8 @@ export async function runConsultation({ patientName, symptoms, location }: Consu
   // Step 4: Synthesizer translates all findings into the strict JSON schema
   const finalInput = `Front Desk: ${frontDeskResult}\nClinic: ${clinicResult}\nPharmacy: ${pharmacyResult}\nRisk Assessment: ${riskResult}\nFollow-Up Plan: ${followUpResult}`;
   console.log("[Synthesizer-Agent] Synthesizing final payload...");
-  const interaction = await ai.models.generateContent({
-    model: synthesizerAgent.model,
+  const interaction = await getAi().models.generateContent({
+    model: synthesizerAgent.model || getDefaultModel(),
     contents: finalInput,
     config: {
       systemInstruction: "You are the orchestrator. Synthesize the reports into a strict JSON.",
