@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
+    "check:bundle": "node --env-file-if-exists=.env scripts/check-bundle-secrets.mjs",
     "test:integration": "tsx tests/integration/run.ts"
   },
   "dependencies": {
