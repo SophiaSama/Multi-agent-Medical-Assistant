@@ -53,6 +53,16 @@ jobs:
         if: steps.guard.outputs.run == 'true'
         run: npm run lint
 
+      # Build with the real secrets in the environment (as Vercel does), then
+      # fail if any server-only secret value or pattern landed in dist/.
+      - name: Build
+        if: steps.guard.outputs.run == 'true'
+        run: npm run build
+
+      - name: Scan client bundle for secrets
+        if: steps.guard.outputs.run == 'true'
+        run: npm run check:bundle
+
       - name: Start server
         if: steps.guard.outputs.run == 'true'
         run: |
